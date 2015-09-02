@@ -2,16 +2,31 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
-	"time"
 )
 
-type Config struct {
-	HeartBeat  time.Duration
-	ReadLimit  int64
-	WriteLimit int64
+type Server struct {
+	srv         *gotcp.Server
+	nsqproducer *NsqProducer
+	nsqconsumer *NsqConsumer
 }
 
-type Server struct {
-	srv    *gotcp.Server
-	nsqsrv *NsqServer
+func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer) {
+	return &Server{
+		srv:         srv,
+		nsqproducer: nsqproducer,
+		nsqconsumer: nsqconsumer,
+	}
+}
+
+func (s *Server) Start() {
+	go s.nsqproducer.Start()
+	go s.nsqconsumer.Start()
+
+	go s.srv.Start()
+}
+
+func (s *Server) Stop() {
+	s.srv.Stop()
+	s.nsqproducer.Stop()
+	s.nsqconsumer.Stop()
 }

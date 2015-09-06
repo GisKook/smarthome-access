@@ -10,7 +10,7 @@ type Server struct {
 	nsqconsumer *NsqConsumer
 }
 
-func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer) {
+func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer) *Server {
 	return &Server{
 		srv:         srv,
 		nsqproducer: nsqproducer,

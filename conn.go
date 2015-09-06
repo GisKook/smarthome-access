@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+var ConnSuccess = 0
+var ConnNormal = 1
+
 type ConnConfig struct {
 	HeartBeat    time.Duration
 	ReadLimit    int64
@@ -25,6 +28,7 @@ type Conn struct {
 	packetNsqReceiveChan chan gotcp.Packet
 	index                int32
 	uid                  string
+	status               uint8
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
@@ -38,6 +42,7 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		closeChan:            make(chan struct{}),
 		packetNsqReceiveChan: make(chan Packet, config.NsqChanLimit),
 		index:                0,
+		status:               ConnNormal,
 	}
 }
 
@@ -116,6 +121,8 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 	c.PutExtraData(&conn)
 
 	conn.Do()
+
+	NewConns().Add(conn)
 
 	return true
 }

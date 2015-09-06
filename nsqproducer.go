@@ -8,9 +8,7 @@ import (
 )
 
 type NsqProducerConfig struct {
-	Addr    string
-	Topic   string
-	Channel string
+	Addr string
 }
 
 type NsqProducer struct {

@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/byte/go-nsq"
+	"github.com/bitly/go-nsq"
 )
 
 type NsqConsumerConfig struct {
@@ -17,37 +17,55 @@ type NsqConsumer struct {
 	config    *NsqConsumerConfig
 	waitGroup *sync.WaitGroup
 
-	cosumer *nsq.Consumer
+	consumer *nsq.Consumer
 }
 
 func NewNsqConsumer(config *NsqConsumerConfig) *NsqConsumer {
 	return &NsqConsumer{
 		config:    config,
-		waitGroup: &sync.WaitGroup(),
+		waitGroup: &sync.WaitGroup{},
 	}
 }
 
 func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		msg := message.Body
-		log.Printf("recv nsq message " + msg)
+		log.Println("recv nsq message " + string(msg))
+
+		return nil
 	}))
 }
 
 func (s *NsqConsumer) Start() {
 	s.waitGroup.Add(1)
-	config := nsq.NewConfig
+	defer func() {
+		s.waitGroup.Done()
+		err := recover()
+		if err != nil {
+			log.Println("err found")
+			s.Stop()
+		}
+
+	}()
+
+	config := nsq.NewConfig()
 
 	var errmsg error
-	s.consumer, errmsg = nsq.NewConsumer(s.config.Addr, s.config.Topic, config)
+	s.consumer, errmsg = nsq.NewConsumer(s.config.Topic, s.config.Channel, config)
 
 	if errmsg != nil {
-		log.Printf("create consumer error " + errmsg.Error())
+		//	panic("create consumer error -> " + errmsg.Error())
+		log.Println("create consumer error -> " + errmsg.Error())
+	}
+	s.recvNsq()
+
+	err := s.consumer.ConnectToNSQD(s.config.Addr)
+	if err != nil {
+		panic("Counld not connect to nsq -> " + err.Error())
 	}
 }
 
 func (s *NsqConsumer) Stop() {
-	s.waitGroup.Done()
 	s.waitGroup.Wait()
 
 	errmsg := s.consumer.DisconnectFromNSQD(s.config.Addr)

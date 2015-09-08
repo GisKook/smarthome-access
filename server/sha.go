@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"github.com/giskook/gotcp"
 	"github.com/giskook/smarthome-access"
+	"log"
+	"net"
+	"os"
 	"os/signal"
 	"runtime"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -21,7 +26,7 @@ func main() {
 		PacketSendChanLimit:    20,
 		PacketReceiveChanLimit: 20,
 	}
-	srv := gotcp.NewServer(config, &Callback{}, &echo.EchoProtocol{})
+	srv := gotcp.NewServer(config, &sha.Callback{}, &sha.ShaProtocol{})
 
 	// creates a nsqproducer server
 	nsqpconfig := &sha.NsqProducerConfig{
@@ -32,13 +37,17 @@ func main() {
 	// creates a nsqconsumer server
 	nsqcconfig := &sha.NsqConsumerConfig{
 		Addr:    "127.0.0.1:4150",
-		Topic:   "topic",
-		Channel: "channel",
+		Topic:   "write_test",
+		Channel: "ch",
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig)
 
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver)
-	shaserver.Start()
+	shaserverconfig := &sha.ServerConfig{
+		Listener:      listener,
+		AcceptTimeout: time.Second,
+	}
+	shaserver.Start(shaserverconfig)
 
 	// starts service
 	fmt.Println("listening:", listener.Addr())
@@ -50,7 +59,6 @@ func main() {
 
 	// stops service
 	srv.Stop()
-
 }
 
 func checkError(err error) {

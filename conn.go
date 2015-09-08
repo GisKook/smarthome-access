@@ -2,13 +2,12 @@ package sha
 
 import (
 	"bytes"
-	"errors"
 	"github.com/giskook/gotcp"
 	"time"
 )
 
-var ConnSuccess = 0
-var ConnNormal = 1
+var ConnSuccess uint8 = 0
+var ConnNormal uint8 = 1
 
 type ConnConfig struct {
 	HeartBeat    time.Duration
@@ -26,7 +25,7 @@ type Conn struct {
 	writeflag            int64
 	closeChan            chan struct{}
 	packetNsqReceiveChan chan gotcp.Packet
-	index                int32
+	index                uint32
 	uid                  string
 	status               uint8
 }
@@ -34,13 +33,13 @@ type Conn struct {
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 	return &Conn{
 		conn:                 conn,
-		recieveBuffer:        bytes.NewBuffer([]bytes{}),
+		recieveBuffer:        bytes.NewBuffer([]byte{}),
 		config:               config,
 		readflag:             time.Now().Unix(),
 		writeflag:            time.Now().Unix(),
 		ticker:               time.NewTicker(config.HeartBeat),
 		closeChan:            make(chan struct{}),
-		packetNsqReceiveChan: make(chan Packet, config.NsqChanLimit),
+		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
 		index:                0,
 		status:               ConnNormal,
 	}
@@ -65,7 +64,7 @@ func (c *Conn) writeToclientLoop() {
 		case <-c.closeChan:
 			return
 		case p := <-c.packetNsqReceiveChan:
-			if _, err := c.conn.GetRawConn.Write(p.Serialize()); err != nil {
+			if _, err := c.conn.GetRawConn().Write(p.Serialize()); err != nil {
 				return
 			}
 		}
@@ -129,9 +128,13 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData()
-	conn.Close()
+	element, _ := conn.(Conn)
+	element.Close()
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
+	shaPacket := p.(*ShaPacket)
+	c.AsyncWritePacket(shaPacket, time.Second)
+
 	return true
 }

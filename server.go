@@ -2,7 +2,14 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
+	"net"
+	"time"
 )
+
+type ServerConfig struct {
+	Listener      *net.TCPListener
+	AcceptTimeout time.Duration
+}
 
 type Server struct {
 	srv         *gotcp.Server
@@ -18,11 +25,11 @@ func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqCons
 	}
 }
 
-func (s *Server) Start() {
+func (s *Server) Start(config *ServerConfig) {
 	go s.nsqproducer.Start()
 	go s.nsqconsumer.Start()
 
-	go s.srv.Start()
+	go s.srv.Start(config.Listener, config.AcceptTimeout)
 }
 
 func (s *Server) Stop() {

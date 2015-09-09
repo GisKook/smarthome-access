@@ -6,11 +6,13 @@ import (
 )
 
 var (
-	Login           uint8 = 0
-	HeartBeat       uint8 = 1
-	SendDeviceList  uint8 = 2
-	OperateFeedback uint8 = 3
-	AddDevice       uint8 = 4
+	Illegal         uint8 = 0
+	HalfPack        uint8 = 255
+	Login           uint8 = 1
+	HeartBeat       uint8 = 2
+	SendDeviceList  uint8 = 3
+	OperateFeedback uint8 = 4
+	AddDevice       uint8 = 5
 	DelDevice       uint8 = 5
 )
 

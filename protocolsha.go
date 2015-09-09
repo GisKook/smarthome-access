@@ -1,12 +1,17 @@
 package sha
 
 import (
+	"bytes"
 	"github.com/giskook/gotcp"
 )
 
 var (
-	Login     uint8 = 0
-	HeartBeat uint8 = 1
+	Login           uint8 = 0
+	HeartBeat       uint8 = 1
+	SendDeviceList  uint8 = 2
+	OperateFeedback uint8 = 3
+	AddDevice       uint8 = 4
+	DelDevice       uint8 = 5
 )
 
 type ShaPacket struct {
@@ -37,21 +42,22 @@ type ShaProtocol struct {
 
 func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	conn := c.GetRawConn()
+	smconn := c.GetExtraData()
+	element, _ := smconn.(Conn)
+	buffer := element.GetBuffer()
 
 	for {
-		data := make([]byte, 1024)
+		var data [2048]byte
 		readLengh, err := conn.Read(data)
 
 		if err != nil {
 			return nil, err
 		}
 
-		var uid []byte
-		uid = append(uid, 0x01)
-		uid = append(uid, 0x02)
 		if readLengh == 0 {
 			return nil, gotcp.ErrConnClosing
 		} else {
+
 			if data[1] == 0xAA {
 				return NewShaPacket(Login, NewLoginPakcet(uid, 1, 1)), nil
 			} else {

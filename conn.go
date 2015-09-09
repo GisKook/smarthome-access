@@ -53,6 +53,10 @@ func (c *Conn) Close() {
 	c.conn.Close()
 }
 
+func (c *Conn) GetBuffer() *bytes.Buffer {
+	return c.recieveBuffer
+}
+
 func (c *Conn) writeToclientLoop() {
 	defer func() {
 		recover()

@@ -6,17 +6,18 @@ var (
 	WarningButton uint8 = 2
 )
 
-//type Device struct {
-//	Oid  []byte
-//	Type uint8
-//}
+type Device struct {
+	Oid     []byte
+	Type    uint8
+	Company uint16
+}
 
 type LoginPacket struct {
 	Uid             []byte
 	BoxVersion      uint8
 	ProtocolVersion uint8
-	//DeviceCount     uint16
-	//DeviceList      []Device
+	DeviceCount     uint16
+	DeviceList      []Device
 
 	Result uint8
 }

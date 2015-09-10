@@ -1,23 +1,22 @@
 package sha
 
 import (
-	"bytes"
 	"github.com/giskook/gotcp"
 )
 
 var (
-	Illegal         uint8 = 0
-	HalfPack        uint8 = 255
-	Login           uint8 = 1
-	HeartBeat       uint8 = 2
-	SendDeviceList  uint8 = 3
-	OperateFeedback uint8 = 4
-	AddDevice       uint8 = 5
-	DelDevice       uint8 = 5
+	Illegal         uint16 = 0
+	HalfPack        uint16 = 255
+	Login           uint16 = 1
+	HeartBeat       uint16 = 2
+	SendDeviceList  uint16 = 3
+	OperateFeedback uint16 = 4
+	AddDevice       uint16 = 5
+	DelDevice       uint16 = 5
 )
 
 type ShaPacket struct {
-	Type   uint8
+	Type   uint16
 	Packet gotcp.Packet
 }
 
@@ -32,7 +31,7 @@ func (this *ShaPacket) Serialize() []byte {
 	return nil
 }
 
-func NewShaPacket(Type uint8, Packet gotcp.Packet) *ShaPacket {
+func NewShaPacket(Type uint16, Packet gotcp.Packet) *ShaPacket {
 	return &ShaPacket{
 		Type:   Type,
 		Packet: Packet,
@@ -49,7 +48,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	buffer := element.GetBuffer()
 
 	for {
-		var data [2048]byte
+		data := make([]byte, 2048)
 		readLengh, err := conn.Read(data)
 
 		if err != nil {
@@ -59,11 +58,16 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		if readLengh == 0 {
 			return nil, gotcp.ErrConnClosing
 		} else {
-
-			if data[1] == 0xAA {
-				return NewShaPacket(Login, NewLoginPakcet(uid, 1, 1)), nil
-			} else {
-				return NewShaPacket(HeartBeat, NewHeartPacket(uid)), nil
+			buffer.Write(data[0:readLengh])
+			cmdid, pkglen := CheckProtocol(buffer)
+			switch cmdid {
+			case Login:
+				pkgbyte := make([]byte, pkglen)
+				buffer.Read(pkgbyte)
+				pkg := ParseLogin(pkgbyte)
+				return NewShaPacket(Login, pkg), nil
+			case Illegal:
+			case HalfPack:
 			}
 		}
 	}

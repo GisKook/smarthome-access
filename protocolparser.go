@@ -7,14 +7,14 @@ import (
 
 func CheckSum(cmd []byte, cmdlen uint16) byte {
 	temp := cmd[0]
-	for i := 1; i < cmdlen; i++ {
+	for i := uint16(1); i < cmdlen; i++ {
 		temp ^= cmd[i]
 	}
 
 	return temp
 }
 
-func CheckProtocol(buffer *bytes.Buffer) (uint8, uint16) {
+func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 	bufferlen := buffer.Len()
 	if bufferlen == 0 {
 		return Illegal, 0
@@ -23,7 +23,7 @@ func CheckProtocol(buffer *bytes.Buffer) (uint8, uint16) {
 		buffer.ReadByte()
 		CheckProtocol(buffer)
 	} else if bufferlen > 2 {
-		var temp [2]byte
+		temp := make([]byte, 2)
 		temp[0] = buffer.Bytes()[1]
 		temp[1] = buffer.Bytes()[2]
 		pkglen := binary.BigEndian.Uint16(temp)
@@ -31,10 +31,10 @@ func CheckProtocol(buffer *bytes.Buffer) (uint8, uint16) {
 			buffer.ReadByte()
 			CheckProtocol(buffer)
 		}
-		if pkglen > bufferlen {
+		if int(pkglen) > bufferlen {
 			return HalfPack, 0
 		} else {
-			if CheckSum(buffer.Bytes()[0], pkglen-2) == buffer.Bytes()[pkglen-2] && buffer.Bytes()[pkglen-1] == 0xCE {
+			if CheckSum(buffer.Bytes(), pkglen-2) == buffer.Bytes()[pkglen-2] && buffer.Bytes()[pkglen-1] == 0xCE {
 				temp[0] = buffer.Bytes()[3]
 				temp[1] = buffer.Bytes()[4]
 				cmdid := binary.BigEndian.Uint16(temp)
@@ -47,4 +47,6 @@ func CheckProtocol(buffer *bytes.Buffer) (uint8, uint16) {
 	} else {
 		return HalfPack, 0
 	}
+
+	return Illegal, 0
 }

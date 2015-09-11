@@ -2,6 +2,7 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
+	"log"
 )
 
 var (
@@ -44,7 +45,7 @@ type ShaProtocol struct {
 func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	conn := c.GetRawConn()
 	smconn := c.GetExtraData()
-	element, _ := smconn.(Conn)
+	element, _ := smconn.(*Conn)
 	buffer := element.GetBuffer()
 
 	for {

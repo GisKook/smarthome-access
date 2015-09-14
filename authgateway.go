@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"encoding/binary"
+	//	"encoding/binary"
 	"fmt"
 	_ "github.com/lib/pq"
-	"strconv"
+	//	"strconv"
 )
 
 type Device struct {
@@ -33,24 +33,51 @@ type GatewayHub struct {
 	Gateway map[uint64]*GatewayProperty
 }
 
+func Char2Byte(c string) byte {
+	switch c {
+	case "0":
+		return 0
+	case "1":
+		return 1
+	case "2":
+		return 2
+	case "3":
+		return 3
+	case "4":
+		return 4
+	case "5":
+		return 5
+	case "6":
+		return 6
+	case "7":
+		return 7
+	case "8":
+		return 8
+	case "9":
+		return 9
+	case "a":
+		return 10
+	case "b":
+		return 11
+	case "c":
+		return 12
+	case "d":
+		return 13
+	case "e":
+		return 14
+	case "f":
+		return 15
+	}
+	return 0
+}
+
 func Macaddr2Uint64(mac []uint8) uint64 {
 	fmt.Println("%s\n", mac)
-	var temp byte
-	var value string
-	value = mac[0]
-	value += mac[1]
+	temp := Char2Byte(string(mac[0]))
 
-	var buffer []byte
-	buffer = append(buffer, 0)
-	buffer = append(buffer, 0)
-	buffer = append(buffer, mac[0]-'0')
-	buffer = append(buffer, mac[2]-'0')
-	buffer = append(buffer, mac[4]-'0')
-	buffer = append(buffer, mac[6]-'0')
-	buffer = append(buffer, mac[8]-'0')
-	buffer = append(buffer, mac[10]-'0')
-
-	return binary.BigEndian.Uint64(buffer)
+	fmt.Printf("ddddddddddddddddd%d\n", temp)
+	return 0
+	//return binary.BigEndian.Uint64(buffer)
 }
 
 func (g *GatewayHub) LoadAll() error {

@@ -26,7 +26,7 @@ type Conn struct {
 	closeChan            chan struct{}
 	packetNsqReceiveChan chan gotcp.Packet
 	index                uint32
-	uid                  string
+	uid                  uint64
 	status               uint8
 }
 

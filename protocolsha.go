@@ -2,7 +2,6 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
-	"log"
 )
 
 var (

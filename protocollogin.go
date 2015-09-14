@@ -12,13 +12,13 @@ var (
 )
 
 type Device struct {
-	Oid     []byte
+	Oid     uint64
 	Type    uint8
 	Company uint16
 }
 
 type LoginPacket struct {
-	Uid             []byte
+	Uid             uint64
 	BoxVersion      uint8
 	ProtocolVersion uint8
 	DeviceList      []Device

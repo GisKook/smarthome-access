@@ -2,10 +2,9 @@ package main
 
 import (
 	"database/sql"
-	//	"encoding/binary"
+	"encoding/binary"
 	"fmt"
 	_ "github.com/lib/pq"
-	//	"strconv"
 )
 
 type Device struct {
@@ -72,16 +71,27 @@ func Char2Byte(c string) byte {
 }
 
 func Macaddr2Uint64(mac []uint8) uint64 {
-	fmt.Println("%s\n", mac)
-	temp := Char2Byte(string(mac[0]))
+	var buffer []byte
+	buffer = append(buffer, 0)
+	buffer = append(buffer, 0)
+	value := Char2Byte(string(mac[0]))*16 + Char2Byte(string(mac[1]))
+	buffer = append(buffer, value)
+	value = Char2Byte(string(mac[3]))*16 + Char2Byte(string(mac[4]))
+	buffer = append(buffer, value)
+	value = Char2Byte(string(mac[6]))*16 + Char2Byte(string(mac[7]))
+	buffer = append(buffer, value)
+	value = Char2Byte(string(mac[9]))*16 + Char2Byte(string(mac[10]))
+	buffer = append(buffer, value)
+	value = Char2Byte(string(mac[12]))*16 + Char2Byte(string(mac[13]))
+	buffer = append(buffer, value)
+	value = Char2Byte(string(mac[15]))*16 + Char2Byte(string(mac[16]))
+	buffer = append(buffer, value)
 
-	fmt.Printf("ddddddddddddddddd%d\n", temp)
-	return 0
-	//return binary.BigEndian.Uint64(buffer)
+	return binary.BigEndian.Uint64(buffer)
 }
 
 func (g *GatewayHub) LoadAll() error {
-	st, err := g.Db.Prepare("select * from gateway")
+	st, err := g.Db.Prepare("select deviceid, gatewayid, devicetype, company from gateway")
 	if err != nil {
 		return err
 	}
@@ -90,19 +100,43 @@ func (g *GatewayHub) LoadAll() error {
 	if er != nil {
 		return er
 	}
+	defer st.Close()
 
-	var mac []uint8
+	var dmac []uint8
+	var gmac []uint8
+	var devicetype uint8
+	var company uint16
 	for r.Next() {
-		err = r.Scan(&mac)
+		err = r.Scan(&dmac, &gmac, &devicetype, &company)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%d\n", Macaddr2Uint64(mac))
-
+		macindex := Macaddr2Uint64(gmac)
+		_, ok := g.Gateway[macindex]
+		if !ok {
+			g.Gateway[macindex] = &GatewayProperty{
+				Uid:         macindex,
+				Devicecount: 1,
+				Devicelist: []Device{
+					{
+						Oid:     Macaddr2Uint64(dmac),
+						Type:    devicetype,
+						Company: company,
+					},
+				},
+			}
+		} else {
+			g.Gateway[macindex].Devicelist = append(g.Gateway[macindex].Devicelist, Device{
+				Oid:     Macaddr2Uint64(dmac),
+				Type:    devicetype,
+				Company: company,
+			})
+			g.Gateway[macindex].Devicecount++
+		}
 	}
+	defer r.Close()
 
 	return nil
-
 }
 
 func NewGatewayHub(conn *DBConfig) (*GatewayHub, error) {

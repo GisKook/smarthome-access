@@ -49,6 +49,30 @@ func main() {
 	}
 	shaserver.Start(shaserverconfig)
 
+	// database
+
+	dbconfig := &sha.DBConfig{
+		Host:   "192.168.1.155",
+		Port:   "5432",
+		User:   "postgres",
+		Passwd: "cetc",
+		Dbname: "gateway",
+	}
+
+	gatewayhub, err := sha.NewGatewayHub(dbconfig)
+	sha.SetGatewayHub(gatewayhub)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	err = gatewayhub.LoadAll()
+	err = gatewayhub.Listen("gateway")
+	if err != nil {
+		panic(err)
+	}
+
+	gatewayhub.WaitForNotification()
+
 	// starts service
 	fmt.Println("listening:", listener.Addr())
 

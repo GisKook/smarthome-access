@@ -1,4 +1,4 @@
-package main
+package sha
 
 import (
 	"database/sql"
@@ -6,15 +6,16 @@ import (
 	"fmt"
 	"github.com/lib/pq"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
 
-type Device struct {
-	Oid     uint64
-	Type    uint8
-	Company uint16
-}
+//type Device struct {
+//	Oid     uint64
+//	Type    uint8
+//	Company uint16
+//}
 
 type DBConfig struct {
 	Host   string
@@ -37,6 +38,8 @@ type GatewayHub struct {
 	Listener  *pq.Listener
 	waitGroup *sync.WaitGroup
 }
+
+var gatewayhub *GatewayHub
 
 func char2byte(c string) byte {
 	switch c {
@@ -143,7 +146,7 @@ func (g *GatewayHub) LoadAll() error {
 		}
 		gatewayid := macaddr2uint64(gmac)
 		deviceid := macaddr2uint64(dmac)
-		add(gatewayid, deviceid, devicetype, company)
+		g.add(gatewayid, deviceid, devicetype, company)
 	}
 	defer r.Close()
 
@@ -176,29 +179,71 @@ func NewGatewayHub(conn *DBConfig) (*GatewayHub, error) {
 }
 
 func (g *GatewayHub) parsepayload(payload string) (uint64, uint64, uint8, uint16) {
-	values := strings.Split(payload, '^')
-	deviceid := macaddr2uint64(values[1])
-	gatewayid := macaddr2uint64(values[2])
-	devicetype := uint8(strconv.Atoi(values[3]))
-	company := uint16(strconv.Atoi(values[4]))
+	values := strings.Split(payload, "^")
+	deviceid := macaddr2uint64([]uint8(values[1]))
+	gatewayid := macaddr2uint64([]uint8(values[2]))
+	devicetype, _ := strconv.Atoi(values[3])
+	company, _ := strconv.Atoi(values[4])
 
-	return deviceid, gatewayid, devicetype, company
+	return deviceid, gatewayid, uint8(devicetype), uint16(company)
 }
 
 func (g *GatewayHub) insert(payload string) {
-	deviceid, gatewayid, devicetype, company := parsepayload(payload)
-	add(gatewayid, deviceid, devicetype, company)
+	deviceid, gatewayid, devicetype, company := g.parsepayload(payload)
+	g.add(gatewayid, deviceid, devicetype, company)
+	fmt.Println(g.Gateway[gatewayid].Devicelist)
 }
 
-func (g *GatewayHub) waitForNotification() {
+func (g *GatewayHub) del(payload string) {
+	deviceid, gatewayid, _, _ := g.parsepayload(payload)
+	_, ok := g.Gateway[gatewayid]
+	if ok {
+		devicelist := g.Gateway[gatewayid].Devicelist
+		var i uint16
+		for i = 0; i < g.Gateway[gatewayid].Devicecount; i++ {
+			if deviceid == devicelist[i].Oid {
+				devicelist = append(devicelist[:i], devicelist[i+1:]...)
+				g.Gateway[gatewayid].Devicecount--
+				g.Gateway[gatewayid].Devicelist = devicelist
+				break
+			}
+		}
+	}
+	fmt.Println(g.Gateway[gatewayid].Devicelist)
+}
+
+func (g *GatewayHub) update(payload string) {
+	deviceid, gatewayid, devicetype, company := g.parsepayload(payload)
+	_, ok := g.Gateway[gatewayid]
+	if ok {
+		devicelist := g.Gateway[gatewayid].Devicelist
+		var i uint16
+		for i = 0; i < g.Gateway[gatewayid].Devicecount; i++ {
+			if deviceid == devicelist[i].Oid {
+				devicelist[i].Type = devicetype
+				devicelist[i].Company = company
+				break
+			}
+		}
+
+	} else {
+		g.add(gatewayid, deviceid, devicetype, company)
+	}
+	fmt.Println(g.Gateway[gatewayid].Devicelist)
+}
+
+func (g *GatewayHub) WaitForNotification() {
 	for {
 		select {
 		case notify := <-g.Listener.Notify:
 			fmt.Println(notify.Extra)
 			switch notify.Extra[0] {
 			case 'U':
+				g.update(notify.Extra)
 			case 'I':
+				g.insert(notify.Extra)
 			case 'D':
+				g.del(notify.Extra)
 			}
 			break
 		case <-time.After(90 * time.Second):
@@ -214,41 +259,39 @@ func (g *GatewayHub) waitForNotification() {
 	}
 }
 
-func main() {
-	config := &DBConfig{
-		Host:   "192.168.1.155",
-		Port:   "5432",
-		User:   "postgres",
-		Passwd: "cetc",
-		Dbname: "gateway",
-	}
+func (g *GatewayHub) Check(gatewayid uint64) bool {
+	_, ok := g.Gateway[gatewayid]
 
-	gatewayhub, err := NewGatewayHub(config)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	err = gatewayhub.LoadAll()
-	err = gatewayhub.Listen("gateway")
-	if err != nil {
-		panic(err)
-	}
+	return ok
+}
 
-	gatewayhub.waitForNotification()
+func SetGatewayHub(gwh *GatewayHub) {
+	gatewayhub = gwh
+}
 
+func GetGatewayHub() *GatewayHub {
+	return gatewayhub
 }
 
 //func main() {
-//	db, err := sql.Open("postgres", "user=postgres password=cetc dbname=gateway host=192.168.1.155 port=5432 sslmode=disable")
-//	if err != nil {
-//		log.Println("dddddddddddddddd")
-//		log.Fatal(err)
+//	config := &DBConfig{
+//		Host:   "192.168.1.155",
+//		Port:   "5432",
+//		User:   "postgres",
+//		Passwd: "cetc",
+//		Dbname: "gateway",
 //	}
-//	rows, err2 := db.Query("select * from gateway")
-//	if err2 != nil {
-//		log.Println("aaaaaaaaaadddddd")
-//		log.Fatal(err2)
-//	}
-//	log.Println(rows)
 //
+//	gatewayhub, err := NewGatewayHub(config)
+//	if err != nil {
+//		fmt.Println(err.Error())
+//		return
+//	}
+//	err = gatewayhub.LoadAll()
+//	err = gatewayhub.Listen("gateway")
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	gatewayhub.WaitForNotification()
 //}

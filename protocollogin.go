@@ -35,7 +35,7 @@ func (this *LoginPacket) Serialize() []byte {
 	return buf
 }
 
-func NewLoginPakcet(Uid []byte, BoxVersion uint8, ProtocolVersion uint8, DeviceList []Device) *LoginPacket {
+func NewLoginPakcet(Uid uint64, BoxVersion uint8, ProtocolVersion uint8, DeviceList []Device) *LoginPacket {
 	return &LoginPacket{
 		Uid:             Uid,
 		BoxVersion:      BoxVersion,
@@ -50,6 +50,7 @@ func ParseLogin(buffer []byte) *LoginPacket {
 	reader.Seek(5, 0)
 	uid := make([]byte, 6)
 	reader.Read(uid)
+	gatewayid := binary.BigEndian.Uint64(uid)
 	boxversion, _ := reader.ReadByte()
 	protocolversion, _ := reader.ReadByte()
 	devicecount_byte := make([]byte, 2)
@@ -61,12 +62,13 @@ func ParseLogin(buffer []byte) *LoginPacket {
 		deviceidlength, _ := reader.ReadByte()
 		deviceid := make([]byte, deviceidlength)
 		reader.Read(deviceid)
-		devicelist[i].Oid = deviceid
+		did := binary.BigEndian.Uint64(deviceid)
+		devicelist[i].Oid = did
 		devicecompany_byte := make([]byte, 2)
 		devicecompany := binary.BigEndian.Uint16(devicecompany_byte)
 		devicelist[i].Company = devicecompany
 	}
 
-	return NewLoginPakcet(uid, boxversion, protocolversion, devicelist)
+	return NewLoginPakcet(gatewayid, boxversion, protocolversion, devicelist)
 
 }

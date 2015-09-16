@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	"encoding/binary"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
+	"strconv"
+	"sync"
+	"time"
 )
 
 type Device struct {
@@ -30,9 +33,12 @@ type GatewayProperty struct {
 type GatewayHub struct {
 	Db      *sql.DB
 	Gateway map[uint64]*GatewayProperty
+
+	Listener  *pq.Listener
+	waitGroup *sync.WaitGroup
 }
 
-func Char2Byte(c string) byte {
+func char2byte(c string) byte {
 	switch c {
 	case "0":
 		return 0
@@ -70,24 +76,48 @@ func Char2Byte(c string) byte {
 	return 0
 }
 
-func Macaddr2Uint64(mac []uint8) uint64 {
+func macaddr2uint64(mac []uint8) uint64 {
 	var buffer []byte
 	buffer = append(buffer, 0)
 	buffer = append(buffer, 0)
-	value := Char2Byte(string(mac[0]))*16 + Char2Byte(string(mac[1]))
+	value := char2byte(string(mac[0]))*16 + char2byte(string(mac[1]))
 	buffer = append(buffer, value)
-	value = Char2Byte(string(mac[3]))*16 + Char2Byte(string(mac[4]))
+	value = char2byte(string(mac[3]))*16 + char2byte(string(mac[4]))
 	buffer = append(buffer, value)
-	value = Char2Byte(string(mac[6]))*16 + Char2Byte(string(mac[7]))
+	value = char2byte(string(mac[6]))*16 + char2byte(string(mac[7]))
 	buffer = append(buffer, value)
-	value = Char2Byte(string(mac[9]))*16 + Char2Byte(string(mac[10]))
+	value = char2byte(string(mac[9]))*16 + char2byte(string(mac[10]))
 	buffer = append(buffer, value)
-	value = Char2Byte(string(mac[12]))*16 + Char2Byte(string(mac[13]))
+	value = char2byte(string(mac[12]))*16 + char2byte(string(mac[13]))
 	buffer = append(buffer, value)
-	value = Char2Byte(string(mac[15]))*16 + Char2Byte(string(mac[16]))
+	value = char2byte(string(mac[15]))*16 + char2byte(string(mac[16]))
 	buffer = append(buffer, value)
 
 	return binary.BigEndian.Uint64(buffer)
+}
+
+func (g *GatewayHub) add(gatewayid uint64, deviceid uint64, devicetype uint8, company uint16) {
+	_, ok := g.Gateway[gatewayid]
+	if !ok {
+		g.Gateway[gatewayid] = &GatewayProperty{
+			Uid:         gatewayid,
+			Devicecount: 1,
+			Devicelist: []Device{
+				{
+					Oid:     deviceid,
+					Type:    devicetype,
+					Company: company,
+				},
+			},
+		}
+	} else {
+		g.Gateway[gatewayid].Devicelist = append(g.Gateway[gatewayid].Devicelist, Device{
+			Oid:     deviceid,
+			Type:    devicetype,
+			Company: company,
+		})
+		g.Gateway[gatewayid].Devicecount++
+	}
 }
 
 func (g *GatewayHub) LoadAll() error {
@@ -111,32 +141,17 @@ func (g *GatewayHub) LoadAll() error {
 		if err != nil {
 			return err
 		}
-		macindex := Macaddr2Uint64(gmac)
-		_, ok := g.Gateway[macindex]
-		if !ok {
-			g.Gateway[macindex] = &GatewayProperty{
-				Uid:         macindex,
-				Devicecount: 1,
-				Devicelist: []Device{
-					{
-						Oid:     Macaddr2Uint64(dmac),
-						Type:    devicetype,
-						Company: company,
-					},
-				},
-			}
-		} else {
-			g.Gateway[macindex].Devicelist = append(g.Gateway[macindex].Devicelist, Device{
-				Oid:     Macaddr2Uint64(dmac),
-				Type:    devicetype,
-				Company: company,
-			})
-			g.Gateway[macindex].Devicecount++
-		}
+		gatewayid := macaddr2uint64(gmac)
+		deviceid := macaddr2uint64(dmac)
+		add(gatewayid, deviceid, devicetype, company)
 	}
 	defer r.Close()
 
 	return nil
+}
+
+func (g *GatewayHub) Listen(table string) error {
+	return g.Listener.Listen(table)
 }
 
 func NewGatewayHub(conn *DBConfig) (*GatewayHub, error) {
@@ -146,10 +161,57 @@ func NewGatewayHub(conn *DBConfig) (*GatewayHub, error) {
 		return nil, err
 	}
 
+	reportProblem := func(ev pq.ListenerEventType, err error) {
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+
 	return &GatewayHub{
-		Db:      db,
-		Gateway: make(map[uint64]*GatewayProperty),
+		Db:        db,
+		Gateway:   make(map[uint64]*GatewayProperty),
+		Listener:  pq.NewListener(connstring, 10*time.Second, time.Minute, reportProblem),
+		waitGroup: &sync.WaitGroup{},
 	}, nil
+}
+
+func (g *GatewayHub) parsepayload(payload string) (uint64, uint64, uint8, uint16) {
+	values := strings.Split(payload, '^')
+	deviceid := macaddr2uint64(values[1])
+	gatewayid := macaddr2uint64(values[2])
+	devicetype := uint8(strconv.Atoi(values[3]))
+	company := uint16(strconv.Atoi(values[4]))
+
+	return deviceid, gatewayid, devicetype, company
+}
+
+func (g *GatewayHub) insert(payload string) {
+	deviceid, gatewayid, devicetype, company := parsepayload(payload)
+	add(gatewayid, deviceid, devicetype, company)
+}
+
+func (g *GatewayHub) waitForNotification() {
+	for {
+		select {
+		case notify := <-g.Listener.Notify:
+			fmt.Println(notify.Extra)
+			switch notify.Extra[0] {
+			case 'U':
+			case 'I':
+			case 'D':
+			}
+			break
+		case <-time.After(90 * time.Second):
+			go func() {
+				g.Listener.Ping()
+			}()
+			// Check if there's more work available, just in case it takes
+			// a while for the Listener to notice connection loss and
+			// reconnect.
+			fmt.Println("received no work for 90 seconds, checking for new work")
+			break
+		}
+	}
 }
 
 func main() {
@@ -167,9 +229,12 @@ func main() {
 		return
 	}
 	err = gatewayhub.LoadAll()
+	err = gatewayhub.Listen("gateway")
 	if err != nil {
-		fmt.Println(err.Error())
+		panic(err)
 	}
+
+	gatewayhub.waitForNotification()
 
 }
 

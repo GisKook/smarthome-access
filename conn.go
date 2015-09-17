@@ -2,6 +2,7 @@ package sha
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/giskook/gotcp"
 	"time"
 )
@@ -23,8 +24,8 @@ type Conn struct {
 	ticker               *time.Ticker
 	readflag             int64
 	writeflag            int64
-	closeChan            chan struct{}
 	packetNsqReceiveChan chan gotcp.Packet
+	closeChan            chan struct{}
 	index                uint32
 	uid                  uint64
 	status               uint8
@@ -37,9 +38,9 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		config:               config,
 		readflag:             time.Now().Unix(),
 		writeflag:            time.Now().Unix(),
-		ticker:               time.NewTicker(config.HeartBeat),
-		closeChan:            make(chan struct{}),
+		ticker:               time.NewTicker(config.HeartBeat * 1e9),
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
+		closeChan:            make(chan struct{}),
 		index:                0,
 		status:               ConnNormal,
 	}
@@ -48,9 +49,8 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 func (c *Conn) Close() {
 	c.ticker.Stop()
 	c.recieveBuffer.Reset()
-	close(c.closeChan)
 	close(c.packetNsqReceiveChan)
-	c.conn.Close()
+	close(c.closeChan)
 }
 
 func (c *Conn) GetBuffer() *bytes.Buffer {
@@ -59,8 +59,7 @@ func (c *Conn) GetBuffer() *bytes.Buffer {
 
 func (c *Conn) writeToclientLoop() {
 	defer func() {
-		recover()
-		c.Close()
+		c.conn.Close()
 	}()
 
 	for {
@@ -85,22 +84,17 @@ func (c *Conn) UpdateWriteflag() {
 
 func (c *Conn) checkHeart() {
 	defer func() {
-		recover()
-		c.Close()
+		c.conn.Close()
 	}()
 
 	for {
-		select {
-		case <-c.closeChan:
-			return
-		}
-
 		<-c.ticker.C
 		now := time.Now().Unix()
-		if now-c.readflag > 600 {
+		fmt.Println(now - c.readflag)
+		if now-c.readflag > c.config.ReadLimit {
 			return
 		}
-		if now-c.writeflag > 600 {
+		if now-c.writeflag > c.config.WriteLimit {
 			return
 		}
 	}
@@ -115,9 +109,9 @@ type Callback struct{}
 
 func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 	config := &ConnConfig{
-		HeartBeat:  60,
-		ReadLimit:  600,
-		WriteLimit: 600,
+		HeartBeat:  1,
+		ReadLimit:  6,
+		WriteLimit: 6,
 	}
 	conn := NewConn(c, config)
 
@@ -132,7 +126,8 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData()
-	element, _ := conn.(Conn)
+	element, _ := conn.(*Conn)
+
 	element.Close()
 }
 

@@ -50,7 +50,6 @@ func main() {
 	shaserver.Start(shaserverconfig)
 
 	// database
-
 	dbconfig := &sha.DBConfig{
 		Host:   "192.168.1.155",
 		Port:   "5432",
@@ -66,12 +65,17 @@ func main() {
 		return
 	}
 	err = gatewayhub.LoadAll()
+	if err != nil {
+		fmt.Println("connect to db error " + err.Error())
+		return
+	}
+	fmt.Println("gateways has been loaded")
 	err = gatewayhub.Listen("gateway")
 	if err != nil {
 		panic(err)
 	}
 
-	gatewayhub.WaitForNotification()
+	go gatewayhub.WaitForNotification()
 
 	// starts service
 	fmt.Println("listening:", listener.Addr())

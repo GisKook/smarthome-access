@@ -30,7 +30,7 @@ func (cs *Conns) Add(conn *Conn) {
 	cs.connsuid[conn.uid] = conn.index
 }
 
-func (cs *Conns) GetConn(uid string) *Conn {
+func (cs *Conns) GetConn(uid uint64) *Conn {
 	return cs.connsindex[cs.connsuid[uid]]
 }
 

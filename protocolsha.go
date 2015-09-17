@@ -2,6 +2,7 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
+	"log"
 )
 
 var (
@@ -60,12 +61,19 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		} else {
 			buffer.Write(data[0:readLengh])
 			cmdid, pkglen := CheckProtocol(buffer)
+			log.Println(cmdid)
+
 			switch cmdid {
 			case Login:
 				pkgbyte := make([]byte, pkglen)
 				buffer.Read(pkgbyte)
-				pkg := ParseLogin(pkgbyte)
+				pkg := ParseLogin(pkgbyte, c)
 				return NewShaPacket(Login, pkg), nil
+			case HeartBeat:
+				pkgbyte := make([]byte, pkglen)
+				buffer.Read(pkgbyte)
+				pkg := ParseHeart(pkgbyte)
+				return NewShaPacket(HeartBeat, pkg), nil
 			case Illegal:
 			case HalfPack:
 			}

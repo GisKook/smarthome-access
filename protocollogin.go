@@ -1,8 +1,9 @@
 package sha
 
 import (
-	"bytes"
 	"encoding/binary"
+	"github.com/giskook/gotcp"
+	"log"
 )
 
 var (
@@ -53,12 +54,8 @@ func NewLoginPakcet(Uid uint64, BoxVersion uint8, ProtocolVersion uint8, DeviceL
 	}
 }
 
-func ParseLogin(buffer []byte) *LoginPacket {
-	reader := bytes.NewReader(buffer)
-	reader.Seek(5, 0)
-	uid := make([]byte, 6)
-	reader.Read(uid)
-	gatewayid := binary.BigEndian.Uint64(uid)
+func ParseLogin(buffer []byte, c *gotcp.Conn) *LoginPacket {
+	gatewayid, reader := GetGatewayID(buffer)
 	ok := GetGatewayHub().Check(gatewayid)
 	if ok {
 		boxversion, _ := reader.ReadByte()
@@ -72,12 +69,20 @@ func ParseLogin(buffer []byte) *LoginPacket {
 			deviceidlength, _ := reader.ReadByte()
 			deviceid := make([]byte, deviceidlength)
 			reader.Read(deviceid)
-			did := binary.BigEndian.Uint64(deviceid)
+			deid := []byte{0, 0}
+			deid = append(deid, deviceid...)
+			did := binary.BigEndian.Uint64(deid)
 			devicelist[i].Oid = did
 			devicecompany_byte := make([]byte, 2)
 			devicecompany := binary.BigEndian.Uint16(devicecompany_byte)
 			devicelist[i].Company = devicecompany
 		}
+
+		smconn := c.GetExtraData().(*Conn)
+		smconn.uid = gatewayid
+		smconn.SetStatus(ConnSuccess)
+		NewConns().Add(smconn)
+
 		return NewLoginPakcet(gatewayid, boxversion, protocolversion, devicelist, 1)
 	}
 

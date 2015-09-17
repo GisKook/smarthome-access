@@ -2,13 +2,13 @@ package sha
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/giskook/gotcp"
+	"log"
 	"time"
 )
 
 var ConnSuccess uint8 = 0
-var ConnNormal uint8 = 1
+var ConnUnauth uint8 = 1
 
 type ConnConfig struct {
 	HeartBeat    time.Duration
@@ -25,7 +25,6 @@ type Conn struct {
 	readflag             int64
 	writeflag            int64
 	packetNsqReceiveChan chan gotcp.Packet
-	closeChan            chan struct{}
 	index                uint32
 	uid                  uint64
 	status               uint8
@@ -40,9 +39,8 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		writeflag:            time.Now().Unix(),
 		ticker:               time.NewTicker(config.HeartBeat * 1e9),
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
-		closeChan:            make(chan struct{}),
 		index:                0,
-		status:               ConnNormal,
+		status:               ConnUnauth,
 	}
 }
 
@@ -50,7 +48,6 @@ func (c *Conn) Close() {
 	c.ticker.Stop()
 	c.recieveBuffer.Reset()
 	close(c.packetNsqReceiveChan)
-	close(c.closeChan)
 }
 
 func (c *Conn) GetBuffer() *bytes.Buffer {
@@ -58,20 +55,19 @@ func (c *Conn) GetBuffer() *bytes.Buffer {
 }
 
 func (c *Conn) writeToclientLoop() {
-	defer func() {
-		c.conn.Close()
-	}()
-
-	for {
-		select {
-		case <-c.closeChan:
-			return
-		case p := <-c.packetNsqReceiveChan:
-			if _, err := c.conn.GetRawConn().Write(p.Serialize()); err != nil {
-				return
-			}
-		}
-	}
+	//	defer func() {
+	//		c.conn.Close()
+	//	}()
+	//
+	//	for {
+	//		select {
+	//		case p := <-c.packetNsqReceiveChan:
+	//			fmt.Println(p)
+	//			if p != nil {
+	//				c.conn.GetRawConn().Write(p.Serialize())
+	//			}
+	//		}
+	//	}
 }
 
 func (c *Conn) UpdateReadflag() {
@@ -82,6 +78,11 @@ func (c *Conn) UpdateWriteflag() {
 	c.writeflag = time.Now().Unix()
 }
 
+func (c *Conn) SetStatus(status uint8) {
+	c.status = status
+	log.Printf("set status %d\n", c.status)
+}
+
 func (c *Conn) checkHeart() {
 	defer func() {
 		c.conn.Close()
@@ -90,11 +91,13 @@ func (c *Conn) checkHeart() {
 	for {
 		<-c.ticker.C
 		now := time.Now().Unix()
-		fmt.Println(now - c.readflag)
 		if now-c.readflag > c.config.ReadLimit {
 			return
 		}
 		if now-c.writeflag > c.config.WriteLimit {
+			return
+		}
+		if c.status == ConnUnauth {
 			return
 		}
 	}
@@ -109,9 +112,9 @@ type Callback struct{}
 
 func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 	config := &ConnConfig{
-		HeartBeat:  1,
-		ReadLimit:  6,
-		WriteLimit: 6,
+		HeartBeat:  6,
+		ReadLimit:  600,
+		WriteLimit: 600,
 	}
 	conn := NewConn(c, config)
 
@@ -119,16 +122,12 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 
 	conn.Do()
 
-	NewConns().Add(conn)
-
 	return true
 }
 
 func (this *Callback) OnClose(c *gotcp.Conn) {
-	conn := c.GetExtraData()
-	element, _ := conn.(*Conn)
-
-	element.Close()
+	conn := c.GetExtraData().(*Conn)
+	conn.Close()
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {

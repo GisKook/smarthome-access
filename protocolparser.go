@@ -34,7 +34,8 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 		if int(pkglen) > bufferlen {
 			return HalfPack, 0
 		} else {
-			if CheckSum(buffer.Bytes(), pkglen-2) == buffer.Bytes()[pkglen-2] && buffer.Bytes()[pkglen-1] == 0xCE {
+			checksum := CheckSum(buffer.Bytes(), pkglen-2)
+			if checksum == buffer.Bytes()[pkglen-2] && buffer.Bytes()[pkglen-1] == 0xCE {
 				temp[0] = buffer.Bytes()[3]
 				temp[1] = buffer.Bytes()[4]
 				cmdid := binary.BigEndian.Uint16(temp)
@@ -49,4 +50,14 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 	}
 
 	return Illegal, 0
+}
+
+func GetGatewayID(buffer []byte) (uint64, *bytes.Reader) {
+	reader := bytes.NewReader(buffer)
+	reader.Seek(5, 0)
+	uid := make([]byte, 6)
+	reader.Read(uid)
+	gid := []byte{0, 0}
+	gid = append(gid, uid...)
+	return binary.BigEndian.Uint64(gid), reader
 }

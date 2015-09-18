@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"github.com/bitly/go-nsq"
+	"github.com/giskook/smarthome-access/pb"
+	"github.com/golang/protobuf/proto"
 )
 
 type NsqConsumerConfig struct {
@@ -18,19 +20,53 @@ type NsqConsumer struct {
 	waitGroup *sync.WaitGroup
 
 	consumer *nsq.Consumer
+	producer *NsqProducer
 }
 
-func NewNsqConsumer(config *NsqConsumerConfig) *NsqConsumer {
+func NewNsqConsumer(config *NsqConsumerConfig, producer *NsqProducer) *NsqConsumer {
 	return &NsqConsumer{
 		config:    config,
 		waitGroup: &sync.WaitGroup{},
+		producer:  producer,
 	}
 }
 
 func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
-		msg := message.Body
-		log.Println("recv nsq message " + string(msg))
+		data := message.Body
+		command := &Report.ControlReport{}
+		err := proto.Unmarshal(data, command)
+		if err != nil {
+			log.Println("unmarshal error")
+		}
+		gatewayid := command.Tid
+		serialnum := command.SerialNumber
+		switch command.GetCommand().Type {
+		case Report.Command_CMT_REQLOGIN:
+			log.Println("login")
+			log.Println(gatewayid)
+			log.Println(serialnum)
+			replogin := &Report.ControlReport{
+				Tid:          gatewayid,
+				SerialNumber: serialnum,
+				Command: &Report.Command{
+					Type: Report.Command_CMT_REPLOGIN,
+					Paras: []*Report.Command_Param{
+						&Report.Command_Param{
+							Type:  Report.Command_Param_INT8,
+							Npara: 1,
+						},
+					},
+				},
+			}
+			repdata, err := proto.Marshal(replogin)
+			if err != nil {
+				log.Fatal("marshaling error: ", err)
+			}
+			log.Println("send topic")
+			s.producer.Send("topic", repdata)
+
+		}
 		//		controlpacket := NewControlPacket(10000, 20000, 1)
 		//		NewConns().GetConn(10000).SendToGateway(controlpacket)
 

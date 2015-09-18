@@ -1,0 +1,48 @@
+syntax="proto3";
+package Report;
+
+
+message Command {
+	enum CommandType {
+		// up message
+		CMT_INVALID          = 0x0000;  // unillgle
+
+		CMT_REPLOGIN            = 0x0101;
+		CMT_REPONLINE           = 0x0102;
+		CMT_REPWARNUP           = 0x0103;
+		CMT_REPMACK             = 0x0104;
+
+		// down message
+		CMT_REQLOGIN            = 0x8101;
+		CMT_REQONLINE           = 0x8102;
+		CMT_REQWARNUP           = 0x8103;
+	}
+	CommandType type = 1;
+
+	message Param {
+		enum ParaType {
+			Null   = 0x00;
+			INT8   = 0x01;
+			INT16  = 0x02;
+			INT32  = 0x03;
+			INT64  = 0x04;
+			FLOAT  = 0x10;
+			DOUBLE = 0x11;
+			STRING = 0x20;
+			BYTES  = 0x21;
+		}
+		ParaType type = 1;
+		int64  npara  = 2;
+		double dpara  = 3;
+		string strpara= 4;
+		bytes  bpara  = 5;
+	}
+	repeated Param paras = 2;
+}
+
+message ControlReport {
+	uint64  tid = 1;
+	uint32  serial_number = 2;
+
+	Command command = 3;
+}

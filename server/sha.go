@@ -40,7 +40,7 @@ func main() {
 		Topic:   "write_test",
 		Channel: "ch",
 	}
-	nsqcserver := sha.NewNsqConsumer(nsqcconfig)
+	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
 
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver)
 	shaserverconfig := &sha.ServerConfig{

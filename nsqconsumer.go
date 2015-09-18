@@ -31,6 +31,8 @@ func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		msg := message.Body
 		log.Println("recv nsq message " + string(msg))
+		//		controlpacket := NewControlPacket(10000, 20000, 1)
+		//		NewConns().GetConn(10000).SendToGateway(controlpacket)
 
 		return nil
 	}))

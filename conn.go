@@ -25,6 +25,7 @@ type Conn struct {
 	readflag             int64
 	writeflag            int64
 	packetNsqReceiveChan chan gotcp.Packet
+	closeChan            chan bool
 	index                uint32
 	uid                  uint64
 	status               uint8
@@ -39,15 +40,18 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		writeflag:            time.Now().Unix(),
 		ticker:               time.NewTicker(config.HeartBeat * 1e9),
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
+		closeChan:            make(chan bool),
 		index:                0,
 		status:               ConnUnauth,
 	}
 }
 
 func (c *Conn) Close() {
+	c.closeChan <- true
 	c.ticker.Stop()
 	c.recieveBuffer.Reset()
 	close(c.packetNsqReceiveChan)
+	close(c.closeChan)
 }
 
 func (c *Conn) GetBuffer() *bytes.Buffer {
@@ -55,19 +59,24 @@ func (c *Conn) GetBuffer() *bytes.Buffer {
 }
 
 func (c *Conn) writeToclientLoop() {
-	//	defer func() {
-	//		c.conn.Close()
-	//	}()
-	//
-	//	for {
-	//		select {
-	//		case p := <-c.packetNsqReceiveChan:
-	//			fmt.Println(p)
-	//			if p != nil {
-	//				c.conn.GetRawConn().Write(p.Serialize())
-	//			}
-	//		}
-	//	}
+	defer func() {
+		c.conn.Close()
+	}()
+
+	for {
+		select {
+		case p := <-c.packetNsqReceiveChan:
+			if p != nil {
+				c.conn.GetRawConn().Write(p.Serialize())
+			}
+		case <-c.closeChan:
+			return
+		}
+	}
+}
+
+func (c *Conn) SendToGateway(p gotcp.Packet) {
+	c.packetNsqReceiveChan <- p
 }
 
 func (c *Conn) UpdateReadflag() {
@@ -98,6 +107,9 @@ func (c *Conn) checkHeart() {
 			return
 		}
 		if c.status == ConnUnauth {
+			return
+		}
+		if <-c.closeChan {
 			return
 		}
 	}

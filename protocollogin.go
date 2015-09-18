@@ -3,7 +3,6 @@ package sha
 import (
 	"encoding/binary"
 	"github.com/giskook/gotcp"
-	"log"
 )
 
 var (

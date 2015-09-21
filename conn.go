@@ -144,7 +144,13 @@ func (this *Callback) OnClose(c *gotcp.Conn) {
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
-	c.AsyncWritePacket(shaPacket, time.Second)
+	switch shaPacket.Type {
+	case Login:
+	case HeartBeat:
+		c.AsyncWritePacket(shaPacket, time.Second)
+	case SendDeviceList:
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	}
 
 	return true
 }

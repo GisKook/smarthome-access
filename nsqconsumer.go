@@ -53,7 +53,7 @@ func (s *NsqConsumer) recvNsq() {
 					Type: Report.Command_CMT_REPLOGIN,
 					Paras: []*Report.Command_Param{
 						&Report.Command_Param{
-							Type:  Report.Command_Param_INT8,
+							Type:  Report.Command_Param_UINT8,
 							Npara: 1,
 						},
 					},

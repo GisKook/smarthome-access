@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	Illegal         uint16 = 0
-	HalfPack        uint16 = 255
+	Illegal  uint16 = 0
+	HalfPack uint16 = 255
+
 	Login           uint16 = 1
 	HeartBeat       uint16 = 2
 	SendDeviceList  uint16 = 3
@@ -27,6 +28,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*LoginPacket).Serialize()
 	case HeartBeat:
 		return this.Packet.(*HeartPacket).Serialize()
+	case SendDeviceList:
+		return this.Packet.(*DeviceListPacket).Serialize()
 	}
 
 	return nil
@@ -43,11 +46,11 @@ type ShaProtocol struct {
 }
 
 func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
-	conn := c.GetRawConn()
-	smconn := c.GetExtraData()
-	element, _ := smconn.(*Conn)
-	buffer := element.GetBuffer()
+	smconn := c.GetExtraData().(*Conn)
 
+	buffer := smconn.GetBuffer()
+
+	conn := c.GetRawConn()
 	for {
 		data := make([]byte, 2048)
 		readLengh, err := conn.Read(data)
@@ -67,7 +70,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			case Login:
 				pkgbyte := make([]byte, pkglen)
 				buffer.Read(pkgbyte)
-				pkg := ParseLogin(pkgbyte, c)
+				pkg := ParseLogin(pkgbyte, smconn)
 				return NewShaPacket(Login, pkg), nil
 			case HeartBeat:
 				pkgbyte := make([]byte, pkglen)

@@ -42,12 +42,15 @@ func main() {
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
 
-	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver)
+	// create sha server
 	shaserverconfig := &sha.ServerConfig{
 		Listener:      listener,
 		AcceptTimeout: time.Second,
+		Uptopic:       "sha2app",
 	}
-	shaserver.Start(shaserverconfig)
+	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig)
+	sha.SetServer(shaserver)
+	shaserver.Start()
 
 	// database
 	dbconfig := &sha.DBConfig{

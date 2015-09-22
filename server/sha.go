@@ -54,7 +54,7 @@ func main() {
 
 	// database
 	dbconfig := &sha.DBConfig{
-		Host:   "192.168.1.155",
+		Host:   "192.168.8.90",
 		Port:   "5432",
 		User:   "postgres",
 		Passwd: "cetc",

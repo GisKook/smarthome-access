@@ -69,6 +69,10 @@ func ParseDeviceList(buffer []byte, c *Conn) *DeviceListPacket {
 		deviceidlen, _ := reader.ReadByte()
 		deviceid_byte := make([]byte, deviceidlen)
 		reader.Read(deviceid_byte)
+		tmp := make([]byte, 2)
+		tmp[0] = 0
+		tmp[1] = 0
+		deviceid_byte = append(tmp, deviceid_byte)
 		deviceid := binary.BigEndian.Uint64(deviceid_byte)
 		company_byte := make([]byte, 2)
 		reader.Read(company_byte)

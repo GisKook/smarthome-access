@@ -89,7 +89,6 @@ func (c *Conn) UpdateWriteflag() {
 
 func (c *Conn) SetStatus(status uint8) {
 	c.status = status
-	log.Printf("set status %d\n", c.status)
 }
 
 func (c *Conn) checkHeart() {
@@ -101,15 +100,19 @@ func (c *Conn) checkHeart() {
 		<-c.ticker.C
 		now := time.Now().Unix()
 		if now-c.readflag > c.config.ReadLimit {
+			log.Println("read linmit")
 			return
 		}
 		if now-c.writeflag > c.config.WriteLimit {
+			log.Println("write limit")
 			return
 		}
 		if c.status == ConnUnauth {
+			log.Println("status")
 			return
 		}
 		if <-c.closeChan {
+			log.Println("close status")
 			return
 		}
 	}
@@ -146,6 +149,7 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
 	switch shaPacket.Type {
 	case Login:
+		c.AsyncWritePacket(shaPacket, time.Second)
 	case HeartBeat:
 		c.AsyncWritePacket(shaPacket, time.Second)
 	case SendDeviceList:

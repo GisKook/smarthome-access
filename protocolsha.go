@@ -78,7 +78,6 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 				pkg := ParseHeart(pkgbyte)
 				return NewShaPacket(HeartBeat, pkg), nil
 			case SendDeviceList:
-				log.Println("---------")
 				pkgbyte := make([]byte, pkglen)
 				buffer.Read(pkgbyte)
 				pkg := ParseDeviceList(pkgbyte, smconn)

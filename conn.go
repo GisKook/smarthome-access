@@ -153,7 +153,8 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	case HeartBeat:
 		c.AsyncWritePacket(shaPacket, time.Second)
 	case SendDeviceList:
-		log.Println(GetServer().GetTopic())
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	case OperateFeedback:
 		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 	}
 

@@ -15,6 +15,7 @@ var (
 	OperateFeedback uint16 = 4
 	AddDevice       uint16 = 5
 	DelDevice       uint16 = 5
+	Warn            uint16 = 7
 )
 
 type ShaPacket struct {
@@ -30,6 +31,10 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*HeartPacket).Serialize()
 	case SendDeviceList:
 		return this.Packet.(*DeviceListPacket).Serialize()
+	case OperateFeedback:
+		return this.Packet.(*FeedbackPacket).Serialize()
+	case Warn:
+		return this.Packet.(*WarnPacket).Serialize()
 	}
 
 	return nil
@@ -82,6 +87,16 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 				buffer.Read(pkgbyte)
 				pkg := ParseDeviceList(pkgbyte, smconn)
 				return NewShaPacket(SendDeviceList, pkg), nil
+			case OperateFeedback:
+				pkgbyte := make([]byte, pkglen)
+				buffer.Read(pkgbyte)
+				pkg := ParseFeedback(pkgbyte)
+				return NewShaPacket(OperateFeedback, pkg), nil
+			case Warn:
+				pkgbyte := make([]byte, pkglen)
+				buffer.Read(pkgbyte)
+				pkg := ParseWarn(pkgbyte)
+				return NewShaPacket(Warn, pkg), nil
 			case Illegal:
 			case HalfPack:
 			}

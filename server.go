@@ -19,14 +19,14 @@ type Server struct {
 	nsqconsumer *NsqConsumer
 }
 
-var server *Server
+var Gserver *Server
 
 func SetServer(server *Server) {
-	server = server
+	Gserver = server
 }
 
 func GetServer() *Server {
-	return server
+	return Gserver
 }
 
 func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer, config *ServerConfig) *Server {

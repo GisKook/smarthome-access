@@ -43,9 +43,6 @@ func (s *NsqConsumer) recvNsq() {
 		serialnum := command.SerialNumber
 		switch command.GetCommand().Type {
 		case Report.Command_CMT_REQLOGIN:
-			log.Println("login")
-			log.Println(gatewayid)
-			log.Println(serialnum)
 			replogin := &Report.ControlReport{
 				Tid:          gatewayid,
 				SerialNumber: serialnum,
@@ -63,7 +60,6 @@ func (s *NsqConsumer) recvNsq() {
 			if err != nil {
 				log.Fatal("marshaling error: ", err)
 			}
-			log.Println("send topic")
 			s.producer.Send("topic", repdata)
 
 		}

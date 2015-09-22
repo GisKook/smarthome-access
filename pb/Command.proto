@@ -11,13 +11,15 @@ message Command {
 		CMT_REPONLINE           = 0x0102;
 		CMT_REPWARNUP           = 0x0103;
 		CMT_REPMACK             = 0x0104;
-		CMT_REPDEVICELIST       = 0X0105;
+		CMT_REPDEVICELIST       = 0x0105;
+		CMT_REPOPFEEDBACK       = 0x0106;
 
 		// down message
 		CMT_REQLOGIN            = 0x8101;
 		CMT_REQONLINE           = 0x8102;
 		CMT_REQWARNUP           = 0x8103;
 		CMT_REQDEVICELIST       = 0x8105;
+		CMT_REQOP               = 0x8106;
 	}
 	CommandType type = 1;
 

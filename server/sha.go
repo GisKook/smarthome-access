@@ -37,7 +37,7 @@ func main() {
 	// creates a nsqconsumer server
 	nsqcconfig := &sha.NsqConsumerConfig{
 		Addr:    "127.0.0.1:4150",
-		Topic:   "gateway",
+		Topic:   "app2sha",
 		Channel: "ch",
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
@@ -46,7 +46,7 @@ func main() {
 	shaserverconfig := &sha.ServerConfig{
 		Listener:      listener,
 		AcceptTimeout: time.Second,
-		Uptopic:       "gateway",
+		Uptopic:       "sha2app",
 	}
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig)
 	sha.SetServer(shaserver)

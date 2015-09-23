@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
-	"log"
 )
 
 type FeedbackPacket struct {
@@ -14,7 +13,6 @@ type FeedbackPacket struct {
 }
 
 func (p *FeedbackPacket) Serialize() []byte {
-	log.Println("size")
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
@@ -33,7 +31,6 @@ func (p *FeedbackPacket) Serialize() []byte {
 	}
 
 	data, _ := proto.Marshal(feedback)
-	log.Println(len(data))
 
 	return data
 }

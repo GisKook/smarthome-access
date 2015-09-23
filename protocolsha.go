@@ -13,9 +13,8 @@ var (
 	HeartBeat       uint16 = 2
 	SendDeviceList  uint16 = 3
 	OperateFeedback uint16 = 4
-	AddDevice       uint16 = 5
-	DelDevice       uint16 = 5
-	Warn            uint16 = 7
+	AddDelDevice    uint16 = 5
+	Warn            uint16 = 6
 )
 
 type ShaPacket struct {
@@ -35,6 +34,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*FeedbackPacket).Serialize()
 	case Warn:
 		return this.Packet.(*WarnPacket).Serialize()
+	case AddDelDevice:
+		return this.Packet.(*AddDelDevicePacket).Serialize()
 	}
 
 	return nil
@@ -71,32 +72,28 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			cmdid, pkglen := CheckProtocol(buffer)
 			log.Println(cmdid)
 
+			pkgbyte := make([]byte, pkglen)
+			buffer.Read(pkgbyte)
 			switch cmdid {
 			case Login:
-				pkgbyte := make([]byte, pkglen)
-				buffer.Read(pkgbyte)
 				pkg := ParseLogin(pkgbyte, smconn)
 				return NewShaPacket(Login, pkg), nil
 			case HeartBeat:
-				pkgbyte := make([]byte, pkglen)
-				buffer.Read(pkgbyte)
 				pkg := ParseHeart(pkgbyte)
 				return NewShaPacket(HeartBeat, pkg), nil
 			case SendDeviceList:
-				pkgbyte := make([]byte, pkglen)
-				buffer.Read(pkgbyte)
 				pkg := ParseDeviceList(pkgbyte, smconn)
 				return NewShaPacket(SendDeviceList, pkg), nil
 			case OperateFeedback:
-				pkgbyte := make([]byte, pkglen)
-				buffer.Read(pkgbyte)
 				pkg := ParseFeedback(pkgbyte)
 				return NewShaPacket(OperateFeedback, pkg), nil
 			case Warn:
-				pkgbyte := make([]byte, pkglen)
-				buffer.Read(pkgbyte)
 				pkg := ParseWarn(pkgbyte)
 				return NewShaPacket(Warn, pkg), nil
+			case AddDelDevice:
+				pkg := ParseAddDelDevice(pkgbyte)
+				return NewShaPacket(AddDelDevice, pkg), nil
+
 			case Illegal:
 			case HalfPack:
 			}

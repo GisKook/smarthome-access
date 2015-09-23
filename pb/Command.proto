@@ -13,6 +13,7 @@ message Command {
 		CMT_REPMACK             = 0x0104;
 		CMT_REPDEVICELIST       = 0x0105;
 		CMT_REPOPFEEDBACK       = 0x0106;
+		CMT_REPADDDELDEVICE     = 0x0107;
 
 		// down message
 		CMT_REQLOGIN            = 0x8101;

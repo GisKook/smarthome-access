@@ -156,6 +156,11 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 	case OperateFeedback:
 		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	case Warn:
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	case AddDelDevice:
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+
 	}
 
 	return true

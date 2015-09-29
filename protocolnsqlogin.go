@@ -27,7 +27,7 @@ func (p *NsqLoginPacket) Serialize() []byte {
 			Paras: []*Report.Command_Param{
 				&Report.Command_Param{
 					Type:  Report.Command_Param_UINT8,
-					Npara: 1,
+					Npara: uint64(p.Result),
 				},
 			},
 		},

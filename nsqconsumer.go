@@ -39,11 +39,13 @@ func (s *NsqConsumer) recvNsq() {
 			switch command.GetCommand().Type {
 			case Report.Command_CMT_REQLOGIN:
 				packet := ParseNsqLogin(gatewayid, serialnum)
-				s.producer.Send(s.producer.GetTopic(), repdata)
+				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+			case Report.Command_CMT_REQDEVICELIST:
+				packet := ParseNsqDeviceList(gatewayid, serialnum)
+				NewConns().GetConn(gatewayid).SendToGateway(packet)
+			case Report.Command_CMT_REQOP:
 			}
 		}
-		//		controlpacket := NewControlPacket(10000, 20000, 1)
-		//		NewConns().GetConn(10000).SendToGateway(controlpacket)
 
 		return nil
 	}))

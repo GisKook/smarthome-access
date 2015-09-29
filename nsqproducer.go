@@ -8,7 +8,8 @@ import (
 )
 
 type NsqProducerConfig struct {
-	Addr string
+	Addr  string
+	Topic string
 }
 
 type NsqProducer struct {
@@ -50,6 +51,10 @@ func (s *NsqProducer) Start() {
 		//	log.Printf("create producer error" + errmsg.Error())
 		panic("create producer error " + errmsg.Error())
 	}
+}
+
+func (s *NsqProducer) GetTopic() string {
+	return s.config.Topic
 }
 
 func (s *NsqProducer) Stop() {

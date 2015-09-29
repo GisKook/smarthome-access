@@ -34,34 +34,13 @@ func NewNsqConsumer(config *NsqConsumerConfig, producer *NsqProducer) *NsqConsum
 func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
-		command := &Report.ControlReport{}
-		err := proto.Unmarshal(data, command)
-		if err != nil {
-			log.Println("unmarshal error")
-		}
-		gatewayid := command.Tid
-		serialnum := command.SerialNumber
-		switch command.GetCommand().Type {
-		case Report.Command_CMT_REQLOGIN:
-			replogin := &Report.ControlReport{
-				Tid:          gatewayid,
-				SerialNumber: serialnum,
-				Command: &Report.Command{
-					Type: Report.Command_CMT_REPLOGIN,
-					Paras: []*Report.Command_Param{
-						&Report.Command_Param{
-							Type:  Report.Command_Param_UINT8,
-							Npara: 1,
-						},
-					},
-				},
+		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
+		if err == nil {
+			switch command.GetCommand().Type {
+			case Report.Command_CMT_REQLOGIN:
+				packet := ParseNsqLogin(gatewayid, serialnum)
+				s.producer.Send(s.producer.GetTopic(), repdata)
 			}
-			repdata, err := proto.Marshal(replogin)
-			if err != nil {
-				log.Fatal("marshaling error: ", err)
-			}
-			s.producer.Send("topic", repdata)
-
 		}
 		//		controlpacket := NewControlPacket(10000, 20000, 1)
 		//		NewConns().GetConn(10000).SendToGateway(controlpacket)

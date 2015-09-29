@@ -39,3 +39,8 @@ func (cs *Conns) Remove(uid uint64) {
 	delete(cs.connsindex, index)
 	delete(cs.connsuid, uid)
 }
+
+func (cs *Conns) Check(uid uint64) bool {
+	_, ok := cs.connsindex[cs.connsuid[uid]]
+	return ok
+}

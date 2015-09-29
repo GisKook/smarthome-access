@@ -30,7 +30,8 @@ func main() {
 
 	// creates a nsqproducer server
 	nsqpconfig := &sha.NsqProducerConfig{
-		Addr: "127.0.0.1:4150",
+		Addr:  "127.0.0.1:4150",
+		Topic: "sha2app",
 	}
 	nsqpserver := sha.NewNsqProducer(nsqpconfig)
 

@@ -3,6 +3,10 @@ package sha
 import (
 	"bytes"
 	"encoding/binary"
+
+	"errors"
+	"github.com/giskook/smarthome-access/pb"
+	"github.com/golang/protobuf/proto"
 )
 
 func CheckSum(cmd []byte, cmdlen uint16) byte {
@@ -60,4 +64,19 @@ func GetGatewayID(buffer []byte) (uint64, *bytes.Reader) {
 	gid := []byte{0, 0}
 	gid = append(gid, uid...)
 	return binary.BigEndian.Uint64(gid), reader
+}
+
+func CheckNsqProtocol(message []byte) (uint64, uint32, *Report.Command, error) {
+	command := &Report.ControlReport{}
+	err := proto.Unmarshal(data, command)
+	if err != nil {
+		log.Println("unmarshal error")
+		return 0, 0, 0, error.NewError("unmarshal error")
+	} else {
+		gatewayid := command.Tid
+		serialnum := command.SerialNumber
+		cmd := command.GetCommand()
+
+		return gatewayid, serialnum, cmd, nil
+	}
 }

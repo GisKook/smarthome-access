@@ -25,22 +25,6 @@ type DBConfig struct {
 	Dbname string
 }
 
-type GatewayProperty struct {
-	Uid         uint64
-	Devicecount uint16
-	Devicelist  []Device
-}
-
-type GatewayHub struct {
-	Db      *sql.DB
-	Gateway map[uint64]*GatewayProperty
-
-	Listener  *pq.Listener
-	waitGroup *sync.WaitGroup
-}
-
-var gatewayhub *GatewayHub
-
 func char2byte(c string) byte {
 	switch c {
 	case "0":
@@ -79,7 +63,7 @@ func char2byte(c string) byte {
 	return 0
 }
 
-func macaddr2uint64(mac []uint8) uint64 {
+func Macaddr2uint64(mac []uint8) uint64 {
 	var buffer []byte
 	buffer = append(buffer, 0)
 	buffer = append(buffer, 0)
@@ -98,6 +82,22 @@ func macaddr2uint64(mac []uint8) uint64 {
 
 	return binary.BigEndian.Uint64(buffer)
 }
+
+type GatewayProperty struct {
+	Uid         uint64
+	Devicecount uint16
+	Devicelist  []Device
+}
+
+type GatewayHub struct {
+	Db      *sql.DB
+	Gateway map[uint64]*GatewayProperty
+
+	Listener  *pq.Listener
+	waitGroup *sync.WaitGroup
+}
+
+var gatewayhub *GatewayHub
 
 func (g *GatewayHub) add(gatewayid uint64, deviceid uint64, devicetype uint8, company uint16) {
 	_, ok := g.Gateway[gatewayid]
@@ -144,8 +144,8 @@ func (g *GatewayHub) LoadAll() error {
 		if err != nil {
 			return err
 		}
-		gatewayid := macaddr2uint64(gmac)
-		deviceid := macaddr2uint64(dmac)
+		gatewayid := Macaddr2uint64(gmac)
+		deviceid := Macaddr2uint64(dmac)
 		g.add(gatewayid, deviceid, devicetype, company)
 	}
 	defer r.Close()
@@ -180,8 +180,8 @@ func NewGatewayHub(conn *DBConfig) (*GatewayHub, error) {
 
 func (g *GatewayHub) parsepayload(payload string) (uint64, uint64, uint8, uint16) {
 	values := strings.Split(payload, "^")
-	deviceid := macaddr2uint64([]uint8(values[1]))
-	gatewayid := macaddr2uint64([]uint8(values[2]))
+	deviceid := Macaddr2uint64([]uint8(values[1]))
+	gatewayid := Macaddr2uint64([]uint8(values[2]))
 	devicetype, _ := strconv.Atoi(values[3])
 	company, _ := strconv.Atoi(values[4])
 

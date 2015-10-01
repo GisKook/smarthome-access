@@ -1,15 +1,16 @@
 package sha
 
 import (
-	"github.com/bitly/go-nsq"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
+	"log"
 )
 
 var (
-	Offline uint8 = 0
-	Online  uint8 = 1
-	UnAuth  uint8 = 2
+	Offline     uint8 = 0
+	Online      uint8 = 1
+	UnAuth      uint8 = 2
+	PasswdError uint8 = 3
 )
 
 type NsqLoginPacket struct {
@@ -38,20 +39,25 @@ func (p *NsqLoginPacket) Serialize() []byte {
 		log.Println("marshaling error", err)
 	}
 
-	return rep
+	return repdata
 }
 
-func ParseNsqLogin(gatewayid uint64, serialnum uint32) *NsqLoginPacket {
+func ParseNsqLogin(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqLoginPacket {
 	var result uint8 = Offline
-	online := NewConns().Check(gatewayid)
-	var indb bool = false
-	if !online {
-		indb = GetGatewayHub().Check(gatewayid)
-	}
-	if online {
-		result = Online
-	} else if !indb {
-		result = UnAuth
+	cmdparam := command.GetParas()
+	if GetUserPasswdHub().Check(gatewayid, cmdparam[0].Strpara) {
+		online := NewConns().Check(gatewayid)
+		var indb bool = false
+		if !online {
+			indb = GetGatewayHub().Check(gatewayid)
+		}
+		if online {
+			result = Online
+		} else if !indb {
+			result = UnAuth
+		}
+	} else {
+		result = PasswdError
 	}
 
 	return &NsqLoginPacket{

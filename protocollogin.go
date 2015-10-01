@@ -14,6 +14,8 @@ type Device struct {
 	Oid     uint64
 	Type    uint8
 	Company uint16
+	Status  uint8
+	Name    string
 }
 
 type LoginPacket struct {
@@ -72,8 +74,16 @@ func ParseLogin(buffer []byte, c *Conn) *LoginPacket {
 			did := binary.BigEndian.Uint64(deid)
 			devicelist[i].Oid = did
 			devicecompany_byte := make([]byte, 2)
+			reader.Read(devicecompany_byte)
 			devicecompany := binary.BigEndian.Uint16(devicecompany_byte)
 			devicelist[i].Company = devicecompany
+
+			status, _ := reader.ReadByte()
+			devicelist[i].Status = status
+			devicenamelen, _ := reader.ReadByte()
+			devicename := make([]byte, devicenamelen)
+			reader.Read(devicename)
+			devicelist[i].Name = string(devicename)
 		}
 
 		c.uid = gatewayid

@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
+	"log"
 )
 
 type DeviceListPacket struct {
@@ -75,12 +76,19 @@ func ParseDeviceList(buffer []byte, c *Conn) *DeviceListPacket {
 		company_byte := make([]byte, 2)
 		reader.Read(company_byte)
 		company := binary.BigEndian.Uint16(company_byte)
+		status, _ := reader.ReadByte()
+		devicenamelen, _ := reader.ReadByte()
+		devicename := make([]byte, devicenamelen)
+		reader.Read(devicename)
 		DeviceList = append(DeviceList, Device{
 			Oid:     deviceid,
 			Type:    devicetype,
 			Company: company,
+			Status:  status,
+			Name:    string(devicename),
 		})
 	}
+	log.Println(DeviceList)
 
 	return &DeviceListPacket{
 		GatewayID:    gatewayid,

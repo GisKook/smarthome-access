@@ -81,6 +81,21 @@ func main() {
 
 	go gatewayhub.WaitForNotification()
 
+	// database passwd_monitor
+	userhub, err := sha.NewUserPasswdHub(dbconfig)
+	sha.SetUserPasswdHub(userhub)
+	err = userhub.LoadAll()
+	if err != nil {
+		fmt.Println("connect to db error " + err.Error())
+		return
+	}
+	fmt.Println("user info has been loaded")
+	err = userhub.Listen("passwd")
+	if err != nil {
+		panic(err)
+	}
+	go userhub.WaitForNotification()
+
 	// starts service
 	fmt.Println("listening:", listener.Addr())
 

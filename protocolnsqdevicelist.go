@@ -1,9 +1,7 @@
 package sha
 
 import (
-	"github.com/bitly/go-nsq"
-	"github.com/giskook/smarthome-access/pb"
-	"github.com/golang/protobuf/proto"
+	"encoding/binary"
 )
 
 type NsqDeviceListPacket struct {
@@ -19,7 +17,7 @@ func (p *NsqDeviceListPacket) Serialize() []byte {
 	buf = append(buf, 0x80)
 	buf = append(buf, 0x03)
 	gatewayid := make([]byte, 8)
-	binary.BigEndian.PutUint64(gatewayid, this.Uid)
+	binary.BigEndian.PutUint64(gatewayid, p.GatewayID)
 	buf = append(buf, gatewayid[2:]...)
 	buf = append(buf, CheckSum(buf, uint16(len(buf))))
 	buf = append(buf, 0xCE)

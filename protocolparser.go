@@ -3,8 +3,9 @@ package sha
 import (
 	"bytes"
 	"encoding/binary"
-
 	"errors"
+	"log"
+
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
 )
@@ -68,10 +69,10 @@ func GetGatewayID(buffer []byte) (uint64, *bytes.Reader) {
 
 func CheckNsqProtocol(message []byte) (uint64, uint32, *Report.Command, error) {
 	command := &Report.ControlReport{}
-	err := proto.Unmarshal(data, command)
+	err := proto.Unmarshal(message, command)
 	if err != nil {
 		log.Println("unmarshal error")
-		return 0, 0, 0, error.NewError("unmarshal error")
+		return 0, 0, nil, errors.New("unmarshal error")
 	} else {
 		gatewayid := command.Tid
 		serialnum := command.SerialNumber

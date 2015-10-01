@@ -6,7 +6,6 @@ import (
 
 	"github.com/bitly/go-nsq"
 	"github.com/giskook/smarthome-access/pb"
-	"github.com/golang/protobuf/proto"
 )
 
 type NsqConsumerConfig struct {
@@ -36,14 +35,19 @@ func (s *NsqConsumer) recvNsq() {
 		data := message.Body
 		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
 		if err == nil {
-			switch command.GetCommand().Type {
+			switch command.Type {
 			case Report.Command_CMT_REQLOGIN:
-				packet := ParseNsqLogin(gatewayid, serialnum)
+				packet := ParseNsqLogin(gatewayid, serialnum, command)
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			case Report.Command_CMT_REQDEVICELIST:
 				packet := ParseNsqDeviceList(gatewayid, serialnum)
 				NewConns().GetConn(gatewayid).SendToGateway(packet)
 			case Report.Command_CMT_REQOP:
+				packet := ParseNsqOp(gatewayid, serialnum, command)
+				NewConns().GetConn(gatewayid).SendToGateway(packet)
+			case Report.Command_CMT_REQONLINE:
+				packet := ParseNsqCheckOnline(gatewayid, serialnum)
+				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			}
 		}
 

@@ -20,6 +20,7 @@ type Device struct {
 
 type LoginPacket struct {
 	Uid             uint64
+	Name            string
 	BoxVersion      uint8
 	ProtocolVersion uint8
 	DeviceList      []Device
@@ -56,8 +57,11 @@ func NewLoginPakcet(Uid uint64, BoxVersion uint8, ProtocolVersion uint8, DeviceL
 
 func ParseLogin(buffer []byte, c *Conn) *LoginPacket {
 	gatewayid, reader := GetGatewayID(buffer)
-	ok := GetGatewayHub().Check(gatewayid)
+	ok := GetUserPasswdHub().Auth(gatewayid)
 	if ok {
+		gatewaynamelen, _ := reader.ReadByte()
+		gatewayname_byte := make([]byte, gatewaynamelen)
+		reader.Read(gatewayname_byte)
 		boxversion, _ := reader.ReadByte()
 		protocolversion, _ := reader.ReadByte()
 		devicecount_byte := make([]byte, 2)
@@ -86,6 +90,7 @@ func ParseLogin(buffer []byte, c *Conn) *LoginPacket {
 			devicelist[i].Name = string(devicename)
 		}
 
+		NewGatewayHub().Insert(gatewayid, string(gatewayname_byte), devicecount, devicelist)
 		c.uid = gatewayid
 		c.SetStatus(ConnSuccess)
 		NewConns().Add(c)

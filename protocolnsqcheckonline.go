@@ -3,6 +3,7 @@ package sha
 import (
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
+	"log"
 )
 
 type NsqCheckOnlinePacket struct {
@@ -18,8 +19,10 @@ func (p *NsqCheckOnlinePacket) Serialize() []byte {
 		Command: &Report.Command{
 			Type: Report.Command_CMT_REPONLINE,
 			Paras: []*Report.Command_Param{
-				Type:  Report.Command_Param_UINT8,
-				Npara: uint64(p.Result),
+				&Report.Command_Param{
+					Type:  Report.Command_Param_UINT8,
+					Npara: uint64(p.Result),
+				},
 			},
 		},
 	}

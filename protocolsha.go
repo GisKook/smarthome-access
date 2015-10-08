@@ -9,12 +9,13 @@ var (
 	Illegal  uint16 = 0
 	HalfPack uint16 = 255
 
-	Login           uint16 = 1
-	HeartBeat       uint16 = 2
-	SendDeviceList  uint16 = 3
-	OperateFeedback uint16 = 4
-	AddDelDevice    uint16 = 5
-	Warn            uint16 = 6
+	Login                 uint16 = 1
+	HeartBeat             uint16 = 2
+	SendDeviceList        uint16 = 3
+	OperateFeedback       uint16 = 4
+	AddDelDevice          uint16 = 5
+	Warn                  uint16 = 6
+	SetDevicenameFeedback uint16 = 7
 )
 
 type ShaPacket struct {
@@ -36,6 +37,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*WarnPacket).Serialize()
 	case AddDelDevice:
 		return this.Packet.(*AddDelDevicePacket).Serialize()
+	case SetDevicenameFeedback:
+		return this.Packet.(*FeedbackSetDevicenamePacket).Serialize()
 	}
 
 	return nil
@@ -93,6 +96,9 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			case AddDelDevice:
 				pkg := ParseAddDelDevice(pkgbyte)
 				return NewShaPacket(AddDelDevice, pkg), nil
+			case SetDevicenameFeedback:
+				pkg := ParseFeedbackSetDevicename(pkgbyte)
+				return NewShaPacket(SetDevicenameFeedback, pkg), nil
 
 			case Illegal:
 			case HalfPack:

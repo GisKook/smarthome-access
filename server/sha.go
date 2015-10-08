@@ -43,17 +43,7 @@ func main() {
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
 
-	// create sha server
-	shaserverconfig := &sha.ServerConfig{
-		Listener:      listener,
-		AcceptTimeout: time.Second,
-		Uptopic:       "sha2app",
-	}
-	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig)
-	sha.SetServer(shaserver)
-	shaserver.Start()
-
-	// database
+	// database passwd_monitor
 	dbconfig := &sha.DBConfig{
 		Host:   "192.168.8.90",
 		Port:   "5432",
@@ -62,26 +52,23 @@ func main() {
 		Dbname: "gateway",
 	}
 
-	gatewayhub, err := sha.NewGatewayHub(dbconfig)
-	sha.SetGatewayHub(gatewayhub)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	err = gatewayhub.LoadAll()
-	if err != nil {
-		fmt.Println("connect to db error " + err.Error())
-		return
-	}
-	fmt.Println("gateways has been loaded")
-	err = gatewayhub.Listen("gateway")
-	if err != nil {
-		panic(err)
+	database, dberr := sha.NewExecDatabase(dbconfig)
+	if dberr != nil {
+		log.Println(dberr.Error())
+	} else {
+		log.Println("conn to database success")
 	}
 
-	go gatewayhub.WaitForNotification()
+	// create sha server
+	shaserverconfig := &sha.ServerConfig{
+		Listener:      listener,
+		AcceptTimeout: time.Second,
+		Uptopic:       "sha2app",
+	}
+	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig, database)
+	sha.SetServer(shaserver)
+	shaserver.Start()
 
-	// database passwd_monitor
 	userhub, err := sha.NewUserPasswdHub(dbconfig)
 	sha.SetUserPasswdHub(userhub)
 	err = userhub.LoadAll()

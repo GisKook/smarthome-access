@@ -17,6 +17,7 @@ type Server struct {
 	srv         *gotcp.Server
 	nsqproducer *NsqProducer
 	nsqconsumer *NsqConsumer
+	database    *ExecDatabase
 }
 
 var Gserver *Server
@@ -29,12 +30,13 @@ func GetServer() *Server {
 	return Gserver
 }
 
-func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer, config *ServerConfig) *Server {
+func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer, config *ServerConfig, db *ExecDatabase) *Server {
 	return &Server{
 		config:      config,
 		srv:         srv,
 		nsqproducer: nsqproducer,
 		nsqconsumer: nsqconsumer,
+		database:    db,
 	}
 }
 
@@ -44,6 +46,10 @@ func (s *Server) GetProducer() *NsqProducer {
 
 func (s *Server) GetConsumer() *NsqConsumer {
 	return s.nsqconsumer
+}
+
+func (s *Server) GetDatabase() *ExecDatabase {
+	return s.database
 }
 
 func (s *Server) GetTopic() string {

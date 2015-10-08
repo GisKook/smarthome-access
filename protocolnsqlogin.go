@@ -49,7 +49,7 @@ func ParseNsqLogin(gatewayid uint64, serialnum uint32, command *Report.Command) 
 		online := NewConns().Check(gatewayid)
 		var indb bool = false
 		if !online {
-			indb = GetGatewayHub().Check(gatewayid)
+			indb = NewGatewayHub().Check(gatewayid)
 		}
 		if online {
 			result = Online

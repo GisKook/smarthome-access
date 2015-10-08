@@ -2,12 +2,80 @@ package sha
 
 import (
 	"database/sql"
+	"encoding/binary"
 	"fmt"
 	"github.com/lib/pq"
 	"strings"
 	"sync"
 	"time"
 )
+
+type DBConfig struct {
+	Host      string
+	Port      string
+	User      string
+	Passwd    string
+	Dbname    string
+	Tablename string
+}
+
+func char2byte(c string) byte {
+	switch c {
+	case "0":
+		return 0
+	case "1":
+		return 1
+	case "2":
+		return 2
+	case "3":
+		return 3
+	case "4":
+		return 4
+	case "5":
+		return 5
+	case "6":
+		return 6
+	case "7":
+		return 7
+	case "8":
+		return 8
+	case "9":
+		return 9
+	case "a":
+		return 10
+	case "b":
+		return 11
+	case "c":
+		return 12
+	case "d":
+		return 13
+	case "e":
+		return 14
+	case "f":
+		return 15
+	}
+	return 0
+}
+
+func Macaddr2uint64(mac []uint8) uint64 {
+	var buffer []byte
+	buffer = append(buffer, 0)
+	buffer = append(buffer, 0)
+	value := char2byte(string(mac[0]))*16 + char2byte(string(mac[1]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[3]))*16 + char2byte(string(mac[4]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[6]))*16 + char2byte(string(mac[7]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[9]))*16 + char2byte(string(mac[10]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[12]))*16 + char2byte(string(mac[13]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[15]))*16 + char2byte(string(mac[16]))
+	buffer = append(buffer, value)
+
+	return binary.BigEndian.Uint64(buffer)
+}
 
 type UserPasswdHub struct {
 	Db   *sql.DB
@@ -132,6 +200,12 @@ func (u *UserPasswdHub) Check(gatewayid uint64, passwd string) bool {
 	password, _ := u.User[gatewayid]
 
 	return passwd == password
+}
+
+func (u *UserPasswdHub) Auth(gatewayid uint64) bool {
+	_, ok := u.User[gatewayid]
+
+	return ok
 }
 
 func SetUserPasswdHub(uph *UserPasswdHub) {

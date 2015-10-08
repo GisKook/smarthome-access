@@ -48,6 +48,9 @@ func (s *NsqConsumer) recvNsq() {
 			case Report.Command_CMT_REQONLINE:
 				packet := ParseNsqCheckOnline(gatewayid, serialnum)
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+			case Report.Command_CMT_REQSETDEVICENAME:
+				packet := ParseNsqSetDevicename(gatewayid, serialnum, command)
+				NewConns().GetConn(gatewayid).SendToGateway(packet)
 			}
 		}
 

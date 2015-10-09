@@ -54,6 +54,9 @@ func ParseFeedbackSetDevicename(buffer []byte) *FeedbackSetDevicenamePacket {
 	devicename := make([]byte, devicenamelen)
 	if result == 1 {
 		NewGatewayHub().Setname(gatewayid, deviceid, string(devicename))
+		result = 0
+	} else {
+		result = 1
 	}
 
 	return &FeedbackSetDevicenamePacket{

@@ -34,6 +34,8 @@ func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
 		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
+		log.Println("recvnsq")
+		log.Println("cmd %d\n", command.Type)
 		if err == nil {
 			switch command.Type {
 			case Report.Command_CMT_REQLOGIN:
@@ -41,7 +43,8 @@ func (s *NsqConsumer) recvNsq() {
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			case Report.Command_CMT_REQDEVICELIST:
 				packet := ParseNsqDeviceList(gatewayid, serialnum)
-				NewConns().GetConn(gatewayid).SendToGateway(packet)
+				//NewConns().GetConn(gatewayid).SendToGateway(packet)
+				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			case Report.Command_CMT_REQOP:
 				packet := ParseNsqOp(gatewayid, serialnum, command)
 				NewConns().GetConn(gatewayid).SendToGateway(packet)
@@ -51,6 +54,9 @@ func (s *NsqConsumer) recvNsq() {
 			case Report.Command_CMT_REQSETDEVICENAME:
 				packet := ParseNsqSetDevicename(gatewayid, serialnum, command)
 				NewConns().GetConn(gatewayid).SendToGateway(packet)
+			case Report.Command_CMT_REQCHANGEPASSWD:
+				packet := ParseNsqChangePasswd(gatewayid, serialnum, command)
+				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			}
 		}
 

@@ -101,6 +101,12 @@ func (g *GatewayHub) Setname(gatewayid uint64, deviceid uint64, name string) {
 	fmt.Println(g.Gateway[gatewayid].Devicelist)
 }
 
+func (g *GatewayHub) GetGateway(gatewayid uint64) *GatewayProperty {
+	gateway, _ := g.Gateway[gatewayid]
+
+	return gateway
+}
+
 func (g *GatewayHub) Check(gatewayid uint64) bool {
 	_, ok := g.Gateway[gatewayid]
 

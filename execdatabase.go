@@ -32,7 +32,7 @@ func Uint642Macaddr(gatewayid uint64) string {
 	gid := make([]byte, 8)
 	binary.BigEndian.PutUint64(gid, gatewayid)
 	var gidstr string
-	for i := 0; i < 8; i++ {
+	for i := 2; i < 8; i++ {
 		gidstr += hexTable[gid[i]]
 	}
 
@@ -40,7 +40,7 @@ func Uint642Macaddr(gatewayid uint64) string {
 }
 
 func (db *ExecDatabase) SetPasswd(tablename string, gatewayid uint64, newpasswd string) error {
-	sql := fmt.Sprintf("Update %s SET passwd=%s WHERE gatewayid = %s", tablename, newpasswd, Uint642Macaddr(gatewayid))
+	sql := fmt.Sprintf("Update %s SET passwd=%s WHERE gatewayid ='%s'", tablename, newpasswd, Uint642Macaddr(gatewayid))
 	_, err := db.Db.Exec(sql)
 	if err != nil {
 		return err

@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	OldPasswdErr  uint8 = 0
-	ModifySuceess uint8 = 1
+	ModifySuceess uint8 = 0
+	OldPasswdErr  uint8 = 1
 	ModifyFail    uint8 = 2
 )
 
@@ -46,9 +46,11 @@ func (p *NsqChangePasswdPacket) Serialize() []byte {
 
 func ParseNsqChangePasswd(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqChangePasswdPacket {
 	commandparam := command.GetParas()
+	log.Println("change passwd ")
 
 	var result uint8 = ModifySuceess
 	if GetUserPasswdHub().Check(gatewayid, commandparam[0].Strpara) {
+		log.Println("change passwd %s %s\n", commandparam[0].Strpara, commandparam[1].Strpara)
 		err := GetServer().GetDatabase().SetPasswd("passwd", gatewayid, commandparam[1].Strpara)
 		if err != nil {
 			result = ModifyFail

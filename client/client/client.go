@@ -12,7 +12,7 @@ import (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	box := shb.NewSmarthomebox(738734375114, "张凯家")
+	box := shb.NewSmarthomebox(189115999977674, "张凯家")
 	box.Add(1, 1, 1, "厨房的灯", 1)
 	go box.Do("192.168.8.90:8989")
 

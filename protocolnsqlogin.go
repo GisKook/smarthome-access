@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	Offline     uint8 = 0
-	Online      uint8 = 1
+	Online      uint8 = 0
+	Offline     uint8 = 1
 	UnAuth      uint8 = 2
 	PasswdError uint8 = 3
 )
@@ -45,19 +45,18 @@ func (p *NsqLoginPacket) Serialize() []byte {
 func ParseNsqLogin(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqLoginPacket {
 	var result uint8 = Offline
 	cmdparam := command.GetParas()
-	if GetUserPasswdHub().Check(gatewayid, cmdparam[0].Strpara) {
-		online := NewConns().Check(gatewayid)
-		var indb bool = false
-		if !online {
-			indb = NewGatewayHub().Check(gatewayid)
+	if GetUserPasswdHub().Auth(gatewayid) {
+		if GetUserPasswdHub().Check(gatewayid, cmdparam[0].Strpara) {
+			online := NewConns().Check(gatewayid)
+			if online {
+				result = Online
+			}
+		} else {
+			result = PasswdError
 		}
-		if online {
-			result = Online
-		} else if !indb {
-			result = UnAuth
-		}
+
 	} else {
-		result = PasswdError
+		result = UnAuth
 	}
 
 	return &NsqLoginPacket{

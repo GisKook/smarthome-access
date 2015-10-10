@@ -13,10 +13,13 @@ type NsqOpPacket struct {
 }
 
 func (p *NsqOpPacket) Serialize() []byte {
-	buf := []byte{0xCE, 0x00, 0x17, 0x80, 0x04}
+	buf := []byte{0xCE, 0x00, 0x1B, 0x80, 0x04}
 	gatewayid := make([]byte, 8)
 	binary.BigEndian.PutUint64(gatewayid, p.GatewayID)
 	buf = append(buf, gatewayid[2:]...)
+	serialnum := make([]byte, 4)
+	binary.BigEndian.PutUint32(serialnum, p.SerialNumber)
+	buf = append(buf, serialnum...)
 	buf = append(buf, CheckSum(buf, uint16(len(buf))))
 	buf = append(buf, 0xCE)
 

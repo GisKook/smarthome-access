@@ -54,6 +54,9 @@ func (c *Conn) Close() {
 	close(c.closeChan)
 }
 
+func (c *Conn) GetGatewayID() uint64 {
+	return c.uid
+}
 func (c *Conn) GetBuffer() *bytes.Buffer {
 	return c.recieveBuffer
 }
@@ -143,6 +146,8 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData().(*Conn)
 	conn.Close()
+	NewConns().Remove(conn.GetGatewayID())
+	NewGatewayHub().Remove(conn.GetGatewayID())
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {

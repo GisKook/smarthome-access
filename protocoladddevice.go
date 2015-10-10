@@ -12,6 +12,7 @@ type AddDelDevicePacket struct {
 	DeviceType uint8
 	DeviceID   uint64
 	Company    uint16
+	Status     uint8
 }
 
 func (p *AddDelDevicePacket) Serialize() []byte {
@@ -34,6 +35,11 @@ func (p *AddDelDevicePacket) Serialize() []byte {
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT16,
 			Npara: uint64(p.Company),
+		},
+
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Status),
 		},
 	}
 
@@ -65,6 +71,7 @@ func ParseAddDelDevice(buffer []byte) *AddDelDevicePacket {
 	deviedid := binary.BigEndian.Uint64(deviceid_byte)
 	company_byte := make([]byte, 2)
 	company := binary.BigEndian.Uint16(company_byte)
+	status, _ := reader.ReadByte()
 
 	return &AddDelDevicePacket{
 		GatewayID:  gatewayid,
@@ -72,5 +79,6 @@ func ParseAddDelDevice(buffer []byte) *AddDelDevicePacket {
 		DeviceID:   deviedid,
 		Action:     action,
 		Company:    company,
+		Status:     status,
 	}
 }

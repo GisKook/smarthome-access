@@ -85,6 +85,10 @@ func (g *GatewayHub) Del(gatewayid uint64, deviceid uint64) {
 	fmt.Println(g.Gateway[gatewayid].Devicelist)
 }
 
+func (g *GatewayHub) Remove(gatewayid uint64) {
+	delete(g.Gateway, gatewayid)
+}
+
 func (g *GatewayHub) Setname(gatewayid uint64, deviceid uint64, name string) {
 	_, ok := g.Gateway[gatewayid]
 	if ok {

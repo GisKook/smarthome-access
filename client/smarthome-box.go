@@ -170,7 +170,6 @@ func (b *Smarthomebox) adddeldevice(conn *net.TCPConn) {
 	}()
 	ticker := time.NewTicker(3 * time.Second)
 	add := true
-	devicename := "客厅的沙发"
 	for {
 		select {
 		case <-b.ExitChan:
@@ -185,14 +184,12 @@ func (b *Smarthomebox) adddeldevice(conn *net.TCPConn) {
 				adddelcmd = append(adddelcmd, byte(1))
 				add = false
 			} else {
-				adddelcmd = append(adddelcmd, byte(2))
+				adddelcmd = append(adddelcmd, byte(0))
 				add = true
 			}
 			adddelcmd = append(adddelcmd, byte(1))
 			adddelcmd = append(adddelcmd, byte(6))
 			adddelcmd = append(adddelcmd, []byte{0xFF, 0x00, 0x00, 0x00, 0x00, 0xEE, 0x00, 0x01, 0x01}...)
-			adddelcmd = append(adddelcmd, byte(len(devicename)))
-			adddelcmd = append(adddelcmd, []byte(devicename)...)
 			cmdlen := len(adddelcmd) + 2 // 2 for checksum and end flag
 			binary.BigEndian.PutUint16(adddelcmd[1:3], uint16(cmdlen))
 			adddelcmd = append(adddelcmd, CheckSum(adddelcmd, uint16(cmdlen-2)))
@@ -204,6 +201,103 @@ func (b *Smarthomebox) adddeldevice(conn *net.TCPConn) {
 			}
 		}
 	}
+}
+
+func (b *Smarthomebox) warnup(conn *net.TCPConn) {
+	b.Wg.Add(1)
+	defer func() {
+		b.Wg.Done()
+	}()
+
+	ticker := time.NewTicker(3 * time.Second)
+	for {
+		select {
+		case <-b.ExitChan:
+			log.Println("adddel exit")
+			return
+		case <-ticker.C:
+			adddelcmd := []byte{0xCE, 0x00, 0x1E, 0x00, 0x06}
+			gatewayid_byte := make([]byte, 8)
+			binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
+			adddelcmd = append(adddelcmd, gatewayid_byte[2:]...)
+			adddelcmd = append(adddelcmd, byte(1))
+			adddelcmd = append(adddelcmd, byte(6))
+			adddelcmd = append(adddelcmd, []byte{0xFF, 0x00, 0x00, 0x00, 0x00, 0xEE}...)
+			t := time.Now().Unix()
+			t_byte := make([]byte, 8)
+			binary.BigEndian.PutUint64(t_byte, uint64(t))
+			adddelcmd = append(adddelcmd, t_byte...)
+			adddelcmd = append(adddelcmd, byte(1))
+			cmdlen := len(adddelcmd) + 2 // 2 for checksum and end flag
+			binary.BigEndian.PutUint16(adddelcmd[1:3], uint16(cmdlen))
+			adddelcmd = append(adddelcmd, CheckSum(adddelcmd, uint16(cmdlen-2)))
+			adddelcmd = append(adddelcmd, 0xCE)
+			log.Printf("warn up %X\n", adddelcmd)
+			_, err := conn.Write(adddelcmd)
+			if err != nil {
+				log.Println(err.Error())
+			}
+		}
+	}
+
+}
+
+func (b *Smarthomebox) setname(deviceid uint64, name string) {
+	for i := uint16(0); i < b.DeviceCount; i++ {
+		if b.DeviceList[i].DeviceID == deviceid {
+			b.DeviceList[i].Name = name
+		}
+	}
+}
+
+func (b *Smarthomebox) setnamefeedback(conn *net.TCPConn, buffer []byte) {
+	snfb := []byte{0xCE, 0x00, 0x00, 0x00, 0x08}
+	gatewayid_byte := make([]byte, 8)
+	binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
+	snfb = append(snfb, gatewayid_byte[2:]...)
+	snfb = append(snfb, buffer[10:15]...)
+	snfb = append(snfb, 0x01)
+	snfb = append(snfb, 0x06)
+	snfb = append(snfb, buffer[16:22]...)
+	namelen := buffer[22]
+	snfb = append(snfb, buffer[22])
+	snfb = append(snfb, buffer[23:23+namelen]...)
+	deviceid_byte := []byte{0x00, 0x00}
+	deviceid_byte = append(deviceid_byte, buffer[16:22]...)
+	deviceid := binary.BigEndian.Uint64(deviceid_byte)
+	b.setname(deviceid, string(buffer[23:23+namelen]))
+	cmdlen := len(snfb) + 2 // 2 for checksum and end flag
+	binary.BigEndian.PutUint16(snfb[1:3], uint16(cmdlen))
+	snfb = append(snfb, CheckSum(snfb, uint16(cmdlen-2)))
+	snfb = append(snfb, 0xCE)
+	log.Printf("set name %X\n", snfb)
+	_, err := conn.Write(snfb)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+}
+
+func (b *Smarthomebox) opfeedback(conn *net.TCPConn, buffer []byte) {
+	opfb := []byte{0xCE, 0x00, 0x00, 0x00, 0x04}
+	gatewayid_byte := make([]byte, 8)
+	binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
+	opfb = append(opfb, gatewayid_byte[2:]...)
+	log.Printf("op serial %X\n", buffer[0:100])
+
+	opfb = append(opfb, buffer[11:15]...)
+	opfb = append(opfb, 0x01)
+	cmdlen := len(opfb) + 2 // 2 for checksum and end flag
+	binary.BigEndian.PutUint16(opfb[1:3], uint16(cmdlen))
+	opfb = append(opfb, CheckSum(opfb, uint16(cmdlen-2)))
+	opfb = append(opfb, 0xCE)
+
+	log.Printf("op feedback %X\n", opfb)
+	_, err := conn.Write(opfb)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 }
 
 func (b *Smarthomebox) recv(conn *net.TCPConn) {
@@ -220,6 +314,11 @@ func (b *Smarthomebox) recv(conn *net.TCPConn) {
 
 		buffer := make([]byte, 1024)
 		length, _ := conn.Read(buffer)
+		if buffer[3] == 0x80 && buffer[4] == 0x08 {
+			b.setnamefeedback(conn, buffer)
+		} else if buffer[3] == 0x80 && buffer[4] == 0x04 {
+			b.opfeedback(conn, buffer)
+		}
 		log.Printf("recv %X\n", buffer[0:length-1])
 	}
 }
@@ -242,7 +341,8 @@ func (b *Smarthomebox) Do(srvaddr string) {
 	if b.login(conn) == 1 {
 		go b.heart(conn)
 		go b.recv(conn)
-		go b.adddeldevice(conn)
+		//	go b.adddeldevice(conn)
+		//go b.warnup(conn)
 	}
 	b.Wg.Wait()
 }

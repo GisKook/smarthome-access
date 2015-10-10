@@ -15,7 +15,7 @@ var (
 	OperateFeedback       uint16 = 4
 	AddDelDevice          uint16 = 5
 	Warn                  uint16 = 6
-	SetDevicenameFeedback uint16 = 7
+	SetDevicenameFeedback uint16 = 8
 )
 
 type ShaPacket struct {

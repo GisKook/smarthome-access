@@ -255,7 +255,7 @@ func (b *Smarthomebox) setnamefeedback(conn *net.TCPConn, buffer []byte) {
 	gatewayid_byte := make([]byte, 8)
 	binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
 	snfb = append(snfb, gatewayid_byte[2:]...)
-	snfb = append(snfb, buffer[10:15]...)
+	snfb = append(snfb, buffer[11:15]...)
 	snfb = append(snfb, 0x01)
 	snfb = append(snfb, 0x06)
 	snfb = append(snfb, buffer[16:22]...)
@@ -319,7 +319,7 @@ func (b *Smarthomebox) recv(conn *net.TCPConn) {
 		} else if buffer[3] == 0x80 && buffer[4] == 0x04 {
 			b.opfeedback(conn, buffer)
 		}
-		log.Printf("recv %X\n", buffer[0:length-1])
+		log.Printf("recv %X\n", buffer[0:length])
 	}
 }
 

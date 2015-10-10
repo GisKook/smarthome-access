@@ -92,6 +92,8 @@ func (g *GatewayHub) Remove(gatewayid uint64) {
 func (g *GatewayHub) Setname(gatewayid uint64, deviceid uint64, name string) {
 	_, ok := g.Gateway[gatewayid]
 	if ok {
+		fmt.Println(gatewayid)
+		fmt.Println(deviceid)
 		devicelist := g.Gateway[gatewayid].Devicelist
 		var i uint16
 		for i = 0; i < g.Gateway[gatewayid].Devicecount; i++ {

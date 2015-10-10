@@ -52,6 +52,7 @@ func ParseFeedbackSetDevicename(buffer []byte) *FeedbackSetDevicenamePacket {
 	deviceid := binary.BigEndian.Uint64(did)
 	devicenamelen, _ := reader.ReadByte()
 	devicename := make([]byte, devicenamelen)
+	reader.Read(devicename)
 	if result == 1 {
 		NewGatewayHub().Setname(gatewayid, deviceid, string(devicename))
 		result = 0

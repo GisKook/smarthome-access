@@ -27,7 +27,7 @@ func (p *NsqSetDevicename) Serialize() []byte {
 	buf = append(buf, byte(len(p.Name)))
 	buf = append(buf, []byte(p.Name)...)
 	totallen := len(buf) + 2 // 2 for chechsum and end flag
-	binary.BigEndian.PutUint16(buf[2:4], uint16(totallen))
+	binary.BigEndian.PutUint16(buf[1:3], uint16(totallen))
 	buf = append(buf, CheckSum(buf, uint16(len(buf))))
 	buf = append(buf, 0xCE)
 

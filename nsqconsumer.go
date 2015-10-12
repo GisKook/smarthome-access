@@ -42,7 +42,7 @@ func (s *NsqConsumer) recvNsq() {
 				packet := ParseNsqLogin(gatewayid, serialnum, command)
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			case Report.Command_CMT_REQDEVICELIST:
-				packet := ParseNsqDeviceList(gatewayid, serialnum)
+				packet := ParseNsqDeviceList(gatewayid, serialnum, command)
 				//NewConns().GetConn(gatewayid).SendToGateway(packet)
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 			case Report.Command_CMT_REQOP:
@@ -57,6 +57,9 @@ func (s *NsqConsumer) recvNsq() {
 			case Report.Command_CMT_REQCHANGEPASSWD:
 				packet := ParseNsqChangePasswd(gatewayid, serialnum, command)
 				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+			case Report.Command_CMT_REQDELDEVICE:
+				packet := ParseNsqDelDevice(gatewayid, serialnum, command)
+				NewConns().GetConn(gatewayid).SendToGateway(packet)
 			}
 		}
 

@@ -167,6 +167,9 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 	case SetDevicenameFeedback:
 		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	case DelDeviceFeedback:
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+
 	}
 
 	return true

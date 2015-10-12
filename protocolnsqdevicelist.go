@@ -5,9 +5,15 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+var (
+	AllDevice      uint8 = 0
+	SecurityDevice uint8 = 1
+)
+
 type NsqDeviceListPacket struct {
 	GatewayID    uint64
 	SerialNumber uint32
+	DeviceType   uint8
 }
 
 func (p *NsqDeviceListPacket) Serialize() []byte {
@@ -23,31 +29,32 @@ func (p *NsqDeviceListPacket) Serialize() []byte {
 			Npara: uint64(g.Devicecount),
 		},
 	}
+	if p.DeviceType == AllDevice {
+		if g.Devicecount > 0 {
+			for i := uint16(0); i < g.Devicecount; i++ {
+				para = append(para, &Report.Command_Param{
+					Type:  Report.Command_Param_UINT64,
+					Npara: g.Devicelist[i].Oid,
+				})
+				para = append(para, &Report.Command_Param{
+					Type:  Report.Command_Param_UINT8,
+					Npara: uint64(g.Devicelist[i].Type),
+				})
+				para = append(para, &Report.Command_Param{
+					Type:  Report.Command_Param_UINT16,
+					Npara: uint64(g.Devicelist[i].Company),
+				})
 
-	if g.Devicecount > 0 {
-		for i := uint16(0); i < g.Devicecount; i++ {
-			para = append(para, &Report.Command_Param{
-				Type:  Report.Command_Param_UINT64,
-				Npara: g.Devicelist[i].Oid,
-			})
-			para = append(para, &Report.Command_Param{
-				Type:  Report.Command_Param_UINT8,
-				Npara: uint64(g.Devicelist[i].Type),
-			})
-			para = append(para, &Report.Command_Param{
-				Type:  Report.Command_Param_UINT16,
-				Npara: uint64(g.Devicelist[i].Company),
-			})
+				para = append(para, &Report.Command_Param{
+					Type:  Report.Command_Param_UINT8,
+					Npara: uint64(g.Devicelist[i].Status),
+				})
+				para = append(para, &Report.Command_Param{
+					Type:    Report.Command_Param_STRING,
+					Strpara: g.Devicelist[i].Name,
+				})
 
-			para = append(para, &Report.Command_Param{
-				Type:  Report.Command_Param_UINT8,
-				Npara: uint64(g.Devicelist[i].Status),
-			})
-			para = append(para, &Report.Command_Param{
-				Type:    Report.Command_Param_STRING,
-				Strpara: g.Devicelist[i].Name,
-			})
-
+			}
 		}
 	}
 	command := &Report.Command{
@@ -78,9 +85,11 @@ func (p *NsqDeviceListPacket) Serialize() []byte {
 	//	return buf
 }
 
-func ParseNsqDeviceList(gatewayid uint64, serialnum uint32) *NsqDeviceListPacket {
+func ParseNsqDeviceList(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqDeviceListPacket {
+	cmdparam := command.GetParas()
 	return &NsqDeviceListPacket{
 		GatewayID:    gatewayid,
 		SerialNumber: serialnum,
+		DeviceType:   uint8(cmdparam[0].Npara),
 	}
 }

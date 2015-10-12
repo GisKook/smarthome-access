@@ -5,15 +5,14 @@ import (
 	"github.com/giskook/smarthome-access/pb"
 )
 
-type NsqOpPacket struct {
+type NsqDelDevicePacket struct {
 	GatewayID    uint64
 	SerialNumber uint32
 	DeviceID     uint64
-	Op           uint8
 }
 
-func (p *NsqOpPacket) Serialize() []byte {
-	buf := []byte{0xCE, 0x00, 0x19, 0x80, 0x04}
+func (p *NsqDelDevicePacket) Serialize() []byte {
+	buf := []byte{0xCE, 0x00, 0x18, 0x80, 0x09}
 	gatewayid := make([]byte, 8)
 	binary.BigEndian.PutUint64(gatewayid, p.GatewayID)
 	buf = append(buf, gatewayid[2:]...)
@@ -24,21 +23,18 @@ func (p *NsqOpPacket) Serialize() []byte {
 	deviceid := make([]byte, 8)
 	binary.BigEndian.PutUint64(deviceid, p.DeviceID)
 	buf = append(buf, deviceid[2:]...)
-	buf = append(buf, byte(p.Op))
 	buf = append(buf, CheckSum(buf, uint16(len(buf))))
 	buf = append(buf, 0xCE)
 
 	return buf
-
 }
 
-func ParseNsqOp(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqOpPacket {
+func ParseNsqDelDevice(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqDelDevicePacket {
 	commandparam := command.GetParas()
 
-	return &NsqOpPacket{
+	return &NsqDelDevicePacket{
 		GatewayID:    gatewayid,
 		SerialNumber: serialnum,
 		DeviceID:     commandparam[0].Npara,
-		Op:           uint8(commandparam[1].Npara),
 	}
 }

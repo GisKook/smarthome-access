@@ -15,6 +15,7 @@ message Command {
 		CMT_REPOPFEEDBACK       = 0x0106;
 		CMT_REPADDDELDEVICE     = 0x0107;
 		CMT_REPSETDEVICENAME    = 0x0108;
+		CMT_REPDELDEVICE        = 0x0110;
 
 		// down message
 		CMT_REQLOGIN            = 0x8101;
@@ -24,6 +25,7 @@ message Command {
 		CMT_REQOP               = 0x8106;
 		CMT_REQSETDEVICENAME    = 0x8108;
 		CMT_REQCHANGEPASSWD     = 0x8109;
+		CMT_REQDELDEVICE        = 0x8110;
 	}
 	CommandType type = 1;
 

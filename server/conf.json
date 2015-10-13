@@ -1,0 +1,16 @@
+{  
+	"NsqConfig":{  
+		"Addr":"127.0.0.1:4150",
+		"UpTopic":"sha2app",
+		"DownTopic":"app2sha",
+		"Downchannel":"ch"
+	},
+	"DbConfig":{  
+		"Host":"192.168.8.90",
+		"Port":"5432",
+		"User":"postgres",
+		"Passwd":"cetc",
+		"Dbname":"gateway",
+		"Monitortable":"passwd"
+	}
+}

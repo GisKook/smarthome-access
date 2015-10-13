@@ -15,6 +15,10 @@ import (
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	// read configuration
+	configuration, err := sha.ReadConfig("./conf.json")
+
+	checkError(err)
 	// creates a tcp listener
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", ":8989")
 	checkError(err)
@@ -30,26 +34,26 @@ func main() {
 
 	// creates a nsqproducer server
 	nsqpconfig := &sha.NsqProducerConfig{
-		Addr:  "127.0.0.1:4150",
-		Topic: "sha2app",
+		Addr:  configuration.NsqConfig.Addr,
+		Topic: configuration.NsqConfig.UpTopic,
 	}
 	nsqpserver := sha.NewNsqProducer(nsqpconfig)
 
 	// creates a nsqconsumer server
 	nsqcconfig := &sha.NsqConsumerConfig{
-		Addr:    "127.0.0.1:4150",
-		Topic:   "app2sha",
-		Channel: "ch",
+		Addr:    configuration.NsqConfig.Addr,
+		Topic:   configuration.NsqConfig.DownTopic,
+		Channel: configuration.NsqConfig.Downchannel,
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
 
 	// database passwd_monitor
 	dbconfig := &sha.DBConfig{
-		Host:   "192.168.8.90",
-		Port:   "5432",
-		User:   "postgres",
-		Passwd: "cetc",
-		Dbname: "gateway",
+		Host:   configuration.DbConfig.Host,
+		Port:   configuration.DbConfig.Port,
+		User:   configuration.DbConfig.User,
+		Passwd: configuration.DbConfig.Passwd,
+		Dbname: configuration.DbConfig.Dbname,
 	}
 
 	database, dberr := sha.NewExecDatabase(dbconfig)
@@ -63,7 +67,7 @@ func main() {
 	shaserverconfig := &sha.ServerConfig{
 		Listener:      listener,
 		AcceptTimeout: time.Second,
-		Uptopic:       "sha2app",
+		Uptopic:       configuration.NsqConfig.UpTopic,
 	}
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig, database)
 	sha.SetServer(shaserver)
@@ -77,7 +81,7 @@ func main() {
 		return
 	}
 	fmt.Println("user info has been loaded")
-	err = userhub.Listen("passwd")
+	err = userhub.Listen(configuration.DbConfig.Monitortable)
 	if err != nil {
 		panic(err)
 	}

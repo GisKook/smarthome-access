@@ -40,26 +40,40 @@ func (s *NsqConsumer) recvNsq() {
 			switch command.Type {
 			case Report.Command_CMT_REQLOGIN:
 				packet := ParseNsqLogin(gatewayid, serialnum, command)
-				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				if packet != nil {
+					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				}
 			case Report.Command_CMT_REQDEVICELIST:
 				packet := ParseNsqDeviceList(gatewayid, serialnum, command)
 				//NewConns().GetConn(gatewayid).SendToGateway(packet)
-				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				if packet != nil {
+					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				}
 			case Report.Command_CMT_REQOP:
 				packet := ParseNsqOp(gatewayid, serialnum, command)
-				NewConns().GetConn(gatewayid).SendToGateway(packet)
+				if packet != nil {
+					NewConns().GetConn(gatewayid).SendToGateway(packet)
+				}
 			case Report.Command_CMT_REQONLINE:
 				packet := ParseNsqCheckOnline(gatewayid, serialnum)
-				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				if packet != nil {
+					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				}
 			case Report.Command_CMT_REQSETDEVICENAME:
 				packet := ParseNsqSetDevicename(gatewayid, serialnum, command)
-				NewConns().GetConn(gatewayid).SendToGateway(packet)
+				if packet != nil {
+					NewConns().GetConn(gatewayid).SendToGateway(packet)
+				}
 			case Report.Command_CMT_REQCHANGEPASSWD:
 				packet := ParseNsqChangePasswd(gatewayid, serialnum, command)
-				s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				if packet != nil {
+					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+				}
 			case Report.Command_CMT_REQDELDEVICE:
 				packet := ParseNsqDelDevice(gatewayid, serialnum, command)
-				NewConns().GetConn(gatewayid).SendToGateway(packet)
+				if packet != nil {
+					NewConns().GetConn(gatewayid).SendToGateway(packet)
+				}
 			}
 		}
 

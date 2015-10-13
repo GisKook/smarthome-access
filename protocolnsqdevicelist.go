@@ -18,6 +18,9 @@ type NsqDeviceListPacket struct {
 
 func (p *NsqDeviceListPacket) Serialize() []byte {
 	g := NewGatewayHub().GetGateway(p.GatewayID)
+	if g == nil {
+		return nil
+	}
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:    Report.Command_Param_STRING,
@@ -87,6 +90,9 @@ func (p *NsqDeviceListPacket) Serialize() []byte {
 
 func ParseNsqDeviceList(gatewayid uint64, serialnum uint32, command *Report.Command) *NsqDeviceListPacket {
 	cmdparam := command.GetParas()
+	if len(cmdparam) < 1 {
+		return nil
+	}
 	return &NsqDeviceListPacket{
 		GatewayID:    gatewayid,
 		SerialNumber: serialnum,

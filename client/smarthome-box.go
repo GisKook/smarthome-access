@@ -34,7 +34,66 @@ type Smarthomebox struct {
 	ExitChan    chan struct{}
 }
 
-func NewSmarthomebox(gatewayid uint64, name string) *Smarthomebox {
+func char2byte(c string) byte {
+	switch c {
+	case "0":
+		return 0
+	case "1":
+		return 1
+	case "2":
+		return 2
+	case "3":
+		return 3
+	case "4":
+		return 4
+	case "5":
+		return 5
+	case "6":
+		return 6
+	case "7":
+		return 7
+	case "8":
+		return 8
+	case "9":
+		return 9
+	case "a":
+		return 10
+	case "b":
+		return 11
+	case "c":
+		return 12
+	case "d":
+		return 13
+	case "e":
+		return 14
+	case "f":
+		return 15
+	}
+	return 0
+}
+
+func Macaddr2uint64(mac string) uint64 {
+	var buffer []byte
+	buffer = append(buffer, 0)
+	buffer = append(buffer, 0)
+	value := char2byte(string(mac[0]))*16 + char2byte(string(mac[1]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[2]))*16 + char2byte(string(mac[3]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[4]))*16 + char2byte(string(mac[5]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[6]))*16 + char2byte(string(mac[7]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[8]))*16 + char2byte(string(mac[9]))
+	buffer = append(buffer, value)
+	value = char2byte(string(mac[10]))*16 + char2byte(string(mac[11]))
+	buffer = append(buffer, value)
+
+	return binary.BigEndian.Uint64(buffer)
+}
+func NewSmarthomebox(strgatewayid string, name string) *Smarthomebox {
+	gatewayid := Macaddr2uint64(strgatewayid)
+
 	return &Smarthomebox{
 		GatewayID:   gatewayid,
 		Name:        name,
@@ -70,7 +129,8 @@ func (b *Smarthomebox) Del(deviceid uint64) {
 	}
 }
 
-func (b *Smarthomebox) Add(deviceid uint64, devicetype uint8, company uint16, name string, status uint8) {
+func (b *Smarthomebox) Add(strdeviceid string, devicetype uint8, company uint16, name string, status uint8) {
+	deviceid := Macaddr2uint64(strdeviceid)
 	device := &Device{
 		DeviceID:   deviceid,
 		DeviceType: devicetype,
@@ -323,7 +383,8 @@ func (b *Smarthomebox) recv(conn *net.TCPConn) {
 	}
 }
 
-func (b *Smarthomebox) Do(srvaddr string) {
+func (b *Smarthomebox) Do(srvaddr string, wg *sync.WaitGroup) {
+	wg.Add(1)
 	b.Wg.Add(1)
 
 	tcpaddr, _ := net.ResolveTCPAddr("tcp", srvaddr)
@@ -333,6 +394,7 @@ func (b *Smarthomebox) Do(srvaddr string) {
 	defer func() {
 		b.Wg.Done()
 		conn.Close()
+		wg.Done()
 	}()
 	if err != nil {
 		log.Println(err.Error())

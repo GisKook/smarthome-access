@@ -17,6 +17,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	// read configuration
 	configuration, err := sha.ReadConfig("./conf.json")
+	sha.SetConfiguration(configuration)
 
 	checkError(err)
 	// creates a tcp listener
@@ -66,7 +67,7 @@ func main() {
 	// create sha server
 	shaserverconfig := &sha.ServerConfig{
 		Listener:      listener,
-		AcceptTimeout: time.Second,
+		AcceptTimeout: time.Duration(configuration.ServerConfig.ConnTimeout) * time.Second,
 		Uptopic:       configuration.NsqConfig.UpTopic,
 	}
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig, database)

@@ -13,11 +13,12 @@ type ServerConfig struct {
 }
 
 type Server struct {
-	config      *ServerConfig
-	srv         *gotcp.Server
-	nsqproducer *NsqProducer
-	nsqconsumer *NsqConsumer
-	database    *ExecDatabase
+	config           *ServerConfig
+	srv              *gotcp.Server
+	nsqproducer      *NsqProducer
+	nsqconsumer      *NsqConsumer
+	database         *ExecDatabase
+	checkconnsticker *time.Ticker
 }
 
 var Gserver *Server
@@ -31,12 +32,14 @@ func GetServer() *Server {
 }
 
 func NewServer(srv *gotcp.Server, nsqproducer *NsqProducer, nsqconsumer *NsqConsumer, config *ServerConfig, db *ExecDatabase) *Server {
+	serverstatistics := GetConfiguration().GetServerStatistics()
 	return &Server{
-		config:      config,
-		srv:         srv,
-		nsqproducer: nsqproducer,
-		nsqconsumer: nsqconsumer,
-		database:    db,
+		config:           config,
+		srv:              srv,
+		nsqproducer:      nsqproducer,
+		nsqconsumer:      nsqconsumer,
+		database:         db,
+		checkconnsticker: time.NewTicker(time.Duration(serverstatistics) * time.Second),
 	}
 }
 
@@ -67,4 +70,11 @@ func (s *Server) Stop() {
 	s.srv.Stop()
 	s.nsqproducer.Stop()
 	s.nsqconsumer.Stop()
+}
+
+func (s *Server) checkStatistics() {
+	for {
+		<-c.checkconnsticker.C
+
+	}
 }

@@ -11,7 +11,7 @@ var ConnSuccess uint8 = 0
 var ConnUnauth uint8 = 1
 
 type ConnConfig struct {
-	HeartBeat    time.Duration
+	HeartBeat    uint8
 	ReadLimit    int64
 	WriteLimit   int64
 	NsqChanLimit int32
@@ -38,7 +38,7 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		config:               config,
 		readflag:             time.Now().Unix(),
 		writeflag:            time.Now().Unix(),
-		ticker:               time.NewTicker(config.HeartBeat * 1e9),
+		ticker:               time.NewTicker(time.Duration(config.HeartBeat) * time.Second),
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
 		closeChan:            make(chan bool),
 		index:                0,
@@ -111,7 +111,7 @@ func (c *Conn) checkHeart() {
 			return
 		}
 		if c.status == ConnUnauth {
-			log.Println("status")
+			log.Println("unauth's gateway")
 			return
 		}
 		if <-c.closeChan {
@@ -129,10 +129,13 @@ func (c *Conn) Do() {
 type Callback struct{}
 
 func (this *Callback) OnConnect(c *gotcp.Conn) bool {
+	heartbeat := GetConfiguration().GetServerConnCheckInterval()
+	readlimit := GetConfiguration().GetServerReadLimit()
+	writelimit := GetConfiguration().GetServerWriteLimit()
 	config := &ConnConfig{
-		HeartBeat:  6,
-		ReadLimit:  600,
-		WriteLimit: 600,
+		HeartBeat:  uint8(heartbeat),
+		ReadLimit:  int64(readlimit),
+		WriteLimit: int64(writelimit),
 	}
 	conn := NewConn(c, config)
 

@@ -19,7 +19,7 @@ func main() {
 	file, _ := os.OpenFile("./smarthomebox.txt", os.O_RDONLY, 0666)
 	reader := bufio.NewReader(file)
 	wg := &sync.WaitGroup{}
-	boxcount := 1500
+	boxcount := 150000
 	counter := 0
 	for {
 		buf, _, err := reader.ReadLine()
@@ -35,7 +35,7 @@ func main() {
 			box.Add(values[0], 1, 1, values[1], 1)
 		}
 
-		go box.Do("192.168.8.90:8989", wg)
+		go box.Do("192.168.2.67:8989", wg)
 		counter++
 		if counter == boxcount {
 			break

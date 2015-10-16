@@ -377,7 +377,8 @@ func (b *Smarthomebox) recv(conn *net.TCPConn) {
 		}
 
 		buffer := make([]byte, 1024)
-		length, _ := conn.Read(buffer)
+		//length, _ := conn.Read(buffer)
+		conn.Read(buffer)
 		if buffer[3] == 0x80 && buffer[4] == 0x08 {
 			b.setnamefeedback(conn, buffer)
 		} else if buffer[3] == 0x80 && buffer[4] == 0x04 {

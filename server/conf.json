@@ -15,8 +15,8 @@
 	},
 	"ServerConfig":{
 		"ReadLimit":300,
-		"WriteLimit":300,
-		"ConnTimeout":1,
+		"WriteLimit":3000000,
+		"ConnTimeout":5,
 		"ConnCheckInterval":6,
 		"ServerStatistics":10
 	}

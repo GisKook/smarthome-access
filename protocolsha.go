@@ -2,7 +2,6 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
-	"log"
 )
 
 var (
@@ -59,6 +58,7 @@ type ShaProtocol struct {
 
 func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	smconn := c.GetExtraData().(*Conn)
+	smconn.UpdateReadflag()
 
 	buffer := smconn.GetBuffer()
 
@@ -76,7 +76,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		} else {
 			buffer.Write(data[0:readLengh])
 			cmdid, pkglen := CheckProtocol(buffer)
-			log.Printf("recv box cmd %d \n", cmdid)
+			//		log.Printf("recv box cmd %d \n", cmdid)
 
 			pkgbyte := make([]byte, pkglen)
 			buffer.Read(pkgbyte)

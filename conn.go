@@ -99,31 +99,32 @@ func (c *Conn) checkHeart() {
 		c.conn.Close()
 	}()
 
+	var now int64
 	for {
-		<-c.ticker.C
-		now := time.Now().Unix()
-		if now-c.readflag > c.config.ReadLimit {
-			log.Println("read linmit")
-			return
-		}
-		if now-c.writeflag > c.config.WriteLimit {
-			log.Println("write limit")
-			return
-		}
-		if c.status == ConnUnauth {
-			log.Println("unauth's gateway")
-			return
-		}
-		if <-c.closeChan {
-			log.Println("close status")
+		select {
+		case <-c.ticker.C:
+			now = time.Now().Unix()
+			if now-c.readflag > c.config.ReadLimit {
+				log.Println("read linmit")
+				return
+			}
+			if now-c.writeflag > c.config.WriteLimit {
+				log.Println("write limit")
+				return
+			}
+			if c.status == ConnUnauth {
+				log.Println("unauth's gateway")
+				return
+			}
+		case <-c.closeChan:
 			return
 		}
 	}
 }
 
 func (c *Conn) Do() {
-	go c.writeToclientLoop()
 	go c.checkHeart()
+	go c.writeToclientLoop()
 }
 
 type Callback struct{}

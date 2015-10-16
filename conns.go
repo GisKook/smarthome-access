@@ -44,3 +44,7 @@ func (cs *Conns) Check(uid uint64) bool {
 	_, ok := cs.connsindex[cs.connsuid[uid]]
 	return ok
 }
+
+func (cs *Conns) GetCount() int {
+	return len(cs.connsindex)
+}

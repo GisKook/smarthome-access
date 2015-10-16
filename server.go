@@ -2,6 +2,7 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
+	"log"
 	"net"
 	"time"
 )
@@ -64,17 +65,19 @@ func (s *Server) Start() {
 	go s.nsqconsumer.Start()
 
 	go s.srv.Start(s.config.Listener, s.config.AcceptTimeout)
+	go s.checkStatistics()
 }
 
 func (s *Server) Stop() {
 	s.srv.Stop()
 	s.nsqproducer.Stop()
 	s.nsqconsumer.Stop()
+	s.checkconnsticker.Stop()
 }
 
 func (s *Server) checkStatistics() {
 	for {
-		<-c.checkconnsticker.C
-
+		<-s.checkconnsticker.C
+		log.Printf("---------------------Totol Connections : %d---------------------\n", NewConns().GetCount())
 	}
 }

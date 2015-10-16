@@ -113,7 +113,7 @@ func (c *Conn) checkHeart() {
 				return
 			}
 			if c.status == ConnUnauth {
-				log.Println("unauth's gateway")
+				log.Printf("unauth's gateway gatewayid %d\n", c.uid)
 				return
 			}
 		case <-c.closeChan:

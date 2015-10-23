@@ -34,8 +34,6 @@ func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
 		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
-		log.Println("recvnsq")
-		log.Println("cmd %d\n", command.Type)
 		if err == nil {
 			switch command.Type {
 			case Report.Command_CMT_REQLOGIN:

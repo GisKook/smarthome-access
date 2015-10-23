@@ -12,7 +12,7 @@ type NsqDelDevicePacket struct {
 }
 
 func (p *NsqDelDevicePacket) Serialize() []byte {
-	buf := []byte{0xCE, 0x00, 0x18, 0x80, 0x09}
+	buf := []byte{0xCE, 0x00, 0x18, 0x80, 0x0A}
 	gatewayid := make([]byte, 8)
 	binary.BigEndian.PutUint64(gatewayid, p.GatewayID)
 	buf = append(buf, gatewayid[2:]...)

@@ -6,10 +6,10 @@
 			"Downchannel":"ch"
 	},
 	"DbConfig":{  
-		"Host":"192.168.2.67",
+		"Host":"192.168.8.90",
 		"Port":"5432",
 		"User":"postgres",
-		"Passwd":"postgres",
+		"Passwd":"cetc",
 		"Dbname":"gateway",
 		"Monitortable":"passwd"
 	},

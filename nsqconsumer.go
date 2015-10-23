@@ -34,17 +34,23 @@ func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
 		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
+		log.Printf("%X   %d\n", gatewayid, command.Type)
 		if err == nil {
+			if command.Type != Report.Command_CMT_REQLOGIN && !NewGatewayHub().Check(gatewayid) {
+				return nil
+			}
 			switch command.Type {
 			case Report.Command_CMT_REQLOGIN:
 				packet := ParseNsqLogin(gatewayid, serialnum, command)
 				if packet != nil {
+					log.Println("nsq log")
 					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 				}
 			case Report.Command_CMT_REQDEVICELIST:
 				packet := ParseNsqDeviceList(gatewayid, serialnum, command)
 				//NewConns().GetConn(gatewayid).SendToGateway(packet)
 				if packet != nil {
+					log.Println("nsq devicelist")
 					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 				}
 			case Report.Command_CMT_REQOP:
@@ -55,6 +61,7 @@ func (s *NsqConsumer) recvNsq() {
 			case Report.Command_CMT_REQONLINE:
 				packet := ParseNsqCheckOnline(gatewayid, serialnum)
 				if packet != nil {
+					log.Println("nsq devicelist")
 					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 				}
 			case Report.Command_CMT_REQSETDEVICENAME:

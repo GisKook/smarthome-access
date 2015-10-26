@@ -118,3 +118,19 @@ func (g *GatewayHub) Check(gatewayid uint64) bool {
 
 	return ok
 }
+
+func (g *GatewayHub) CheckDevice(gatewayid uint64, deviceid uint64) bool {
+	gp, ok := g.Gateway[gatewayid]
+	fmt.Println(gp)
+	if ok {
+		for i := uint16(0); i < gp.Devicecount; i++ {
+			if gp.Devicelist[i].Oid == deviceid {
+				return true
+			}
+		}
+	}
+	fmt.Println("%d \n", deviceid)
+
+	return false
+
+}

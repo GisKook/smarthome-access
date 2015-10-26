@@ -53,9 +53,9 @@ func ParseFeedbackDelDevice(buffer []byte) *FeedbackDelDevicePacket {
 	deviceid := binary.BigEndian.Uint64(did)
 
 	if result == 0 {
-		NewGatewayHub().Del(gatewayid, deviceid)
 		result = 1
 	} else {
+		NewGatewayHub().Del(gatewayid, deviceid)
 		result = 0
 	}
 	return &FeedbackDelDevicePacket{

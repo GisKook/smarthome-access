@@ -61,7 +61,7 @@ func (s *NsqConsumer) recvNsq() {
 			case Report.Command_CMT_REQONLINE:
 				packet := ParseNsqCheckOnline(gatewayid, serialnum)
 				if packet != nil {
-					log.Println("nsq devicelist")
+					log.Println("nsq checkonline")
 					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 				}
 			case Report.Command_CMT_REQSETDEVICENAME:
@@ -75,9 +75,13 @@ func (s *NsqConsumer) recvNsq() {
 					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
 				}
 			case Report.Command_CMT_REQDELDEVICE:
-				packet := ParseNsqDelDevice(gatewayid, serialnum, command)
+				packet, exist := ParseNsqDelDevice(gatewayid, serialnum, command)
 				if packet != nil {
-					NewConns().GetConn(gatewayid).SendToGateway(packet)
+					if exist {
+						NewConns().GetConn(gatewayid).SendToGateway(packet)
+					} else {
+						s.producer.Send(s.producer.GetTopic(), packet.Serialize())
+					}
 				}
 			}
 		}

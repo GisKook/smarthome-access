@@ -372,11 +372,12 @@ func (b *Smarthomebox) delfeedback(conn *net.TCPConn, buffer []byte) {
 	opdel = append(opdel, buffer[11:15]...)
 	opdel = append(opdel, 0x01)
 	opdel = append(opdel, 0x06)
-	opdel = append(opdel, buffer[16:20]...)
+	opdel = append(opdel, buffer[16:22]...)
 	cmdlen := len(opdel) + 2 // 2 for checksum and end flag
 	opdel = append(opdel, CheckSum(opdel, uint16(cmdlen-2)))
 	opdel = append(opdel, 0xCE)
 
+	log.Printf("%X\n", opdel)
 	_, err := conn.Write(opdel)
 	if err != nil {
 		log.Println(err.Error())

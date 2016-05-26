@@ -1,31 +1,37 @@
 syntax="proto3";
 package Report;
 
-
 message Command {
 	enum CommandType {
-		// up message
 		CMT_INVALID          = 0x0000;  // unillgle
 
-		CMT_REPLOGIN            = 0x0101;
-		CMT_REPONLINE           = 0x0102;
-		CMT_REPWARNUP           = 0x0103;
-		CMT_REPMACK             = 0x0104;
-		CMT_REPDEVICELIST       = 0x0105;
-		CMT_REPOPFEEDBACK       = 0x0106;
-		CMT_REPADDDELDEVICE     = 0x0107;
-		CMT_REPSETDEVICENAME    = 0x0108;
-		CMT_REPDELDEVICE        = 0x0110;
+		// gateway->web message
+		CMT_REP_LOGIN            = 0x0001;
+		CMT_REP_ONLINE           = 0x0002;
+		CMT_REP_ADD_DEL_DEVICE   = 0x0005;  // for mosqitto
+		CMT_REP_WARNUP           = 0x0006;  // for mosqitto
+		CMT_REP_SETNAME          = 0x0008;
+		CMT_REP_DEL_DEVICE       = 0x000a;
+		CMT_REP_DEVICE_ATTR      = 0x000b;
+		CMT_REP_DEPLOYMENT       = 0x000f;
+		CMT_REP_ONOFF            = 0x0013;  // only for onoff device
+		CMT_REP_DEVICE_ONLINE    = 0x0015;  // unsupport right now
+		CMT_REP_ONOFF_STATUS     = 0x0016;  // unsupport right now only for onoff deivce
 
-		// down message
-		CMT_REQLOGIN            = 0x8101;
-		CMT_REQONLINE           = 0x8102;
-		CMT_REQWARNUP           = 0x8103;
-		CMT_REQDEVICELIST       = 0x8105;
-		CMT_REQOP               = 0x8106;
-		CMT_REQSETDEVICENAME    = 0x8108;
-		CMT_REQCHANGEPASSWD     = 0x8109;
-		CMT_REQDELDEVICE        = 0x8110;
+		
+		// web->gateway
+		CMT_REQ_LOGIN               = 0x8001;
+		CMT_REQ_ONLINE              = 0x8002;
+		CMT_REQ_SETNAME             = 0x8008;
+		CMT_REQ_DEL_DEVICE          = 0x800a;
+		CMT_REQ_DEVICE_ATTR         = 0x800b;
+		CMT_REQ_DEVICE_IDENTIFY     = 0x800c;  // no feedback
+		CMT_REQ_DEVICE_WARN         = 0x800d;  // no feedback for device id = 0x0403 warn
+		CMT_REQ_DEPLOYMENT          = 0x800f;
+		CMT_REQ_DEVICE_LEVELCONTROL = 0x8011;  // no feedback
+		CMT_REQ_ONOFF               = 0x8013;  // only for onoff device
+		CMT_REQ_DEVICE_ONLINE       = 0x8015;  // unsupport right now
+		CMT_REQ_ONOFF_STATUS        = 0x8016;  // unsupport right now only for onoff deivce
 	}
 	CommandType type = 1;
 

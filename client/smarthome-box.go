@@ -19,6 +19,7 @@ func CheckSum(cmd []byte, cmdlen uint16) byte {
 
 type Device struct {
 	DeviceID   uint64
+	SzDevieID  string
 	DeviceType uint8
 	Company    uint16
 	Name       string
@@ -27,6 +28,7 @@ type Device struct {
 
 type Smarthomebox struct {
 	GatewayID   uint64
+	SzGatewayID string
 	Name        string
 	DeviceCount uint16
 	DeviceList  []*Device
@@ -96,6 +98,7 @@ func NewSmarthomebox(strgatewayid string, name string) *Smarthomebox {
 
 	return &Smarthomebox{
 		GatewayID:   gatewayid,
+		SzGatewayID: strgatewayid,
 		Name:        name,
 		DeviceCount: 0,
 		DeviceList:  nil,
@@ -133,6 +136,7 @@ func (b *Smarthomebox) Add(strdeviceid string, devicetype uint8, company uint16,
 	deviceid := Macaddr2uint64(strdeviceid)
 	device := &Device{
 		DeviceID:   deviceid,
+		SzDevieID:  strdeviceid,
 		DeviceType: devicetype,
 		Company:    company,
 		Name:       name,
@@ -176,7 +180,7 @@ func (b *Smarthomebox) login(conn *net.TCPConn) uint8 {
 	logincmd = append(logincmd, CheckSum(logincmd, uint16(cmdlen-2)))
 	logincmd = append(logincmd, 0xCE)
 
-	log.Printf("%X\n", logincmd)
+	//log.Printf("%X\n", logincmd)
 	_, err := conn.Write(logincmd)
 	if err != nil {
 		log.Println(err.Error())
@@ -187,10 +191,10 @@ func (b *Smarthomebox) login(conn *net.TCPConn) uint8 {
 	buffer := make([]byte, 1024)
 	conn.Read(buffer)
 	if buffer[11] == 0x01 {
-		log.Println("Login success")
+		//log.Println("Login success")
 		return 1
 	} else {
-		log.Println("Login fail")
+		//log.Println("Login fail")
 		return 0
 	}
 }
@@ -213,7 +217,7 @@ func (b *Smarthomebox) heart(conn *net.TCPConn) {
 			heartcmd = append(heartcmd, heart_byte[2:]...)
 			heartcmd = append(heartcmd, CheckSum(heartcmd, uint16(len(heartcmd))))
 			heartcmd = append(heartcmd, 0xCE)
-			log.Printf("%X\n", heartcmd)
+			//		log.Printf("%X\n", heartcmd)
 			_, err := conn.Write(heartcmd)
 			if err != nil {
 				log.Println(err.Error())
@@ -254,7 +258,7 @@ func (b *Smarthomebox) adddeldevice(conn *net.TCPConn) {
 			binary.BigEndian.PutUint16(adddelcmd[1:3], uint16(cmdlen))
 			adddelcmd = append(adddelcmd, CheckSum(adddelcmd, uint16(cmdlen-2)))
 			adddelcmd = append(adddelcmd, 0xCE)
-			log.Printf("add or del %X\n", adddelcmd)
+			//		log.Printf("add or del %X\n", adddelcmd)
 			_, err := conn.Write(adddelcmd)
 			if err != nil {
 				log.Println(err.Error())
@@ -273,7 +277,7 @@ func (b *Smarthomebox) warnup(conn *net.TCPConn) {
 	for {
 		select {
 		case <-b.ExitChan:
-			log.Println("adddel exit")
+			//log.Println("adddel exit")
 			return
 		case <-ticker.C:
 			adddelcmd := []byte{0xCE, 0x00, 0x1E, 0x00, 0x06}
@@ -292,7 +296,7 @@ func (b *Smarthomebox) warnup(conn *net.TCPConn) {
 			binary.BigEndian.PutUint16(adddelcmd[1:3], uint16(cmdlen))
 			adddelcmd = append(adddelcmd, CheckSum(adddelcmd, uint16(cmdlen-2)))
 			adddelcmd = append(adddelcmd, 0xCE)
-			log.Printf("warn up %X\n", adddelcmd)
+			//		log.Printf("warn up %X\n", adddelcmd)
 			_, err := conn.Write(adddelcmd)
 			if err != nil {
 				log.Println(err.Error())
@@ -330,7 +334,7 @@ func (b *Smarthomebox) setnamefeedback(conn *net.TCPConn, buffer []byte) {
 	binary.BigEndian.PutUint16(snfb[1:3], uint16(cmdlen))
 	snfb = append(snfb, CheckSum(snfb, uint16(cmdlen-2)))
 	snfb = append(snfb, 0xCE)
-	log.Printf("set name %X\n", snfb)
+	//log.Printf("set name %X\n", snfb)
 	_, err := conn.Write(snfb)
 	if err != nil {
 		log.Println(err.Error())
@@ -339,11 +343,11 @@ func (b *Smarthomebox) setnamefeedback(conn *net.TCPConn, buffer []byte) {
 }
 
 func (b *Smarthomebox) opfeedback(conn *net.TCPConn, buffer []byte) {
-	opfb := []byte{0xCE, 0x00, 0x00, 0x00, 0x04}
+	opfb := []byte{0xCE, 0x00, 0x12, 0x00, 0x04}
 	gatewayid_byte := make([]byte, 8)
 	binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
 	opfb = append(opfb, gatewayid_byte[2:]...)
-	log.Printf("op serial %X\n", buffer[0:100])
+	//log.Printf("op serial %X\n", buffer[0:100])
 
 	opfb = append(opfb, buffer[11:15]...)
 	opfb = append(opfb, 0x01)
@@ -352,7 +356,7 @@ func (b *Smarthomebox) opfeedback(conn *net.TCPConn, buffer []byte) {
 	opfb = append(opfb, CheckSum(opfb, uint16(cmdlen-2)))
 	opfb = append(opfb, 0xCE)
 
-	log.Printf("op feedback %X\n", opfb)
+	//log.Printf("op feedback %X\n", opfb)
 	_, err := conn.Write(opfb)
 	if err != nil {
 		log.Println(err.Error())
@@ -360,6 +364,26 @@ func (b *Smarthomebox) opfeedback(conn *net.TCPConn, buffer []byte) {
 
 }
 
+func (b *Smarthomebox) delfeedback(conn *net.TCPConn, buffer []byte) {
+	opdel := []byte{0xCE, 0x00, 0x19, 0x00, 0x0A}
+	gatewayid_byte := make([]byte, 8)
+	binary.BigEndian.PutUint64(gatewayid_byte, b.GatewayID)
+	opdel = append(opdel, gatewayid_byte[2:]...)
+	opdel = append(opdel, buffer[11:15]...)
+	opdel = append(opdel, 0x01)
+	opdel = append(opdel, 0x06)
+	opdel = append(opdel, buffer[16:22]...)
+	cmdlen := len(opdel) + 2 // 2 for checksum and end flag
+	opdel = append(opdel, CheckSum(opdel, uint16(cmdlen-2)))
+	opdel = append(opdel, 0xCE)
+
+	log.Printf("%X\n", opdel)
+	_, err := conn.Write(opdel)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+}
 func (b *Smarthomebox) recv(conn *net.TCPConn) {
 	b.Wg.Add(1)
 	defer func() {
@@ -373,13 +397,18 @@ func (b *Smarthomebox) recv(conn *net.TCPConn) {
 		}
 
 		buffer := make([]byte, 1024)
-		length, _ := conn.Read(buffer)
+		//length, _ := conn.Read(buffer)
+		conn.Read(buffer)
 		if buffer[3] == 0x80 && buffer[4] == 0x08 {
 			b.setnamefeedback(conn, buffer)
 		} else if buffer[3] == 0x80 && buffer[4] == 0x04 {
 			b.opfeedback(conn, buffer)
+		} else if buffer[3] == 0x80 && buffer[4] == 0x0A {
+			b.delfeedback(conn, buffer)
+			log.Println("feedback del")
 		}
-		log.Printf("recv %X\n", buffer[0:length])
+
+		//	log.Printf("recv %X\n", buffer[0:length])
 	}
 }
 
@@ -393,11 +422,19 @@ func (b *Smarthomebox) Do(srvaddr string, wg *sync.WaitGroup) {
 
 	defer func() {
 		b.Wg.Done()
-		conn.Close()
+		if conn != nil {
+			conn.Close()
+		}
 		wg.Done()
 	}()
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
+		log.Printf("%d error\n", b.GatewayID)
+		rb := NewSmarthomebox(b.SzGatewayID, b.Name)
+		for i := uint16(0); i < b.DeviceCount; i++ {
+			rb.Add(b.DeviceList[i].SzDevieID, 1, 1, b.DeviceList[i].Name, 1)
+		}
+		go rb.Do(srvaddr, wg)
 		return
 	}
 	if b.login(conn) == 1 {

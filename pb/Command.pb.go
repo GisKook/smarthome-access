@@ -26,67 +26,85 @@ var _ = math.Inf
 type Command_CommandType int32
 
 const (
-	// up message
-	Command_CMT_INVALID          Command_CommandType = 0
-	Command_CMT_REPLOGIN         Command_CommandType = 257
-	Command_CMT_REPONLINE        Command_CommandType = 258
-	Command_CMT_REPWARNUP        Command_CommandType = 259
-	Command_CMT_REPMACK          Command_CommandType = 260
-	Command_CMT_REPDEVICELIST    Command_CommandType = 261
-	Command_CMT_REPOPFEEDBACK    Command_CommandType = 262
-	Command_CMT_REPADDDELDEVICE  Command_CommandType = 263
-	Command_CMT_REPSETDEVICENAME Command_CommandType = 264
-	Command_CMT_REPDELDEVICE     Command_CommandType = 272
-	// down message
-	Command_CMT_REQLOGIN         Command_CommandType = 33025
-	Command_CMT_REQONLINE        Command_CommandType = 33026
-	Command_CMT_REQWARNUP        Command_CommandType = 33027
-	Command_CMT_REQDEVICELIST    Command_CommandType = 33029
-	Command_CMT_REQOP            Command_CommandType = 33030
-	Command_CMT_REQSETDEVICENAME Command_CommandType = 33032
-	Command_CMT_REQCHANGEPASSWD  Command_CommandType = 33033
-	Command_CMT_REQDELDEVICE     Command_CommandType = 33040
+	Command_CMT_INVALID Command_CommandType = 0
+	// gateway->web message
+	Command_CMT_REQ_LOGIN          Command_CommandType = 1
+	Command_CMT_REP_ONLINE         Command_CommandType = 2
+	Command_CMT_REP_ADD_DEL_DEVICE Command_CommandType = 5
+	Command_CMT_REP_WARNUP         Command_CommandType = 6
+	Command_CMT_REP_SETNAME        Command_CommandType = 8
+	Command_CMT_REP_DEL_DEVICE     Command_CommandType = 10
+	Command_CMT_REP_DEVICE_ATTR    Command_CommandType = 11
+	Command_CMT_REP_DEPLOYMENT     Command_CommandType = 15
+	Command_CMT_REP_ONOFF          Command_CommandType = 19
+	Command_CMT_REP_DEVICE_ONLINE  Command_CommandType = 21
+	Command_CMT_REP_ONOFF_STATUS   Command_CommandType = 22
+	// web->gateway
+	Command_CMT_REP_LOGIN               Command_CommandType = 32769
+	Command_CMT_REQ_ONLINE              Command_CommandType = 32770
+	Command_CMT_REQ_SETNAME             Command_CommandType = 32776
+	Command_CMT_REQ_DEL_DEVICE          Command_CommandType = 32778
+	Command_CMT_REQ_DEVICE_ATTR         Command_CommandType = 32779
+	Command_CMT_REQ_DEVICE_IDENTIFY     Command_CommandType = 32780
+	Command_CMT_REQ_DEVICE_WARN         Command_CommandType = 32781
+	Command_CMT_REQ_DEPLOYMENT          Command_CommandType = 32783
+	Command_CMT_REQ_DEVICE_LEVELCONTROL Command_CommandType = 32785
+	Command_CMT_REQ_ONOFF               Command_CommandType = 32787
+	Command_CMT_REQ_DEVICE_ONLINE       Command_CommandType = 32789
+	Command_CMT_REQ_ONOFF_STATUS        Command_CommandType = 32790
 )
 
 var Command_CommandType_name = map[int32]string{
 	0:     "CMT_INVALID",
-	257:   "CMT_REPLOGIN",
-	258:   "CMT_REPONLINE",
-	259:   "CMT_REPWARNUP",
-	260:   "CMT_REPMACK",
-	261:   "CMT_REPDEVICELIST",
-	262:   "CMT_REPOPFEEDBACK",
-	263:   "CMT_REPADDDELDEVICE",
-	264:   "CMT_REPSETDEVICENAME",
-	272:   "CMT_REPDELDEVICE",
-	33025: "CMT_REQLOGIN",
-	33026: "CMT_REQONLINE",
-	33027: "CMT_REQWARNUP",
-	33029: "CMT_REQDEVICELIST",
-	33030: "CMT_REQOP",
-	33032: "CMT_REQSETDEVICENAME",
-	33033: "CMT_REQCHANGEPASSWD",
-	33040: "CMT_REQDELDEVICE",
+	1:     "CMT_REQ_LOGIN",
+	2:     "CMT_REP_ONLINE",
+	5:     "CMT_REP_ADD_DEL_DEVICE",
+	6:     "CMT_REP_WARNUP",
+	8:     "CMT_REP_SETNAME",
+	10:    "CMT_REP_DEL_DEVICE",
+	11:    "CMT_REP_DEVICE_ATTR",
+	15:    "CMT_REP_DEPLOYMENT",
+	19:    "CMT_REP_ONOFF",
+	21:    "CMT_REP_DEVICE_ONLINE",
+	22:    "CMT_REP_ONOFF_STATUS",
+	32769: "CMT_REP_LOGIN",
+	32770: "CMT_REQ_ONLINE",
+	32776: "CMT_REQ_SETNAME",
+	32778: "CMT_REQ_DEL_DEVICE",
+	32779: "CMT_REQ_DEVICE_ATTR",
+	32780: "CMT_REQ_DEVICE_IDENTIFY",
+	32781: "CMT_REQ_DEVICE_WARN",
+	32783: "CMT_REQ_DEPLOYMENT",
+	32785: "CMT_REQ_DEVICE_LEVELCONTROL",
+	32787: "CMT_REQ_ONOFF",
+	32789: "CMT_REQ_DEVICE_ONLINE",
+	32790: "CMT_REQ_ONOFF_STATUS",
 }
 var Command_CommandType_value = map[string]int32{
-	"CMT_INVALID":          0,
-	"CMT_REPLOGIN":         257,
-	"CMT_REPONLINE":        258,
-	"CMT_REPWARNUP":        259,
-	"CMT_REPMACK":          260,
-	"CMT_REPDEVICELIST":    261,
-	"CMT_REPOPFEEDBACK":    262,
-	"CMT_REPADDDELDEVICE":  263,
-	"CMT_REPSETDEVICENAME": 264,
-	"CMT_REPDELDEVICE":     272,
-	"CMT_REQLOGIN":         33025,
-	"CMT_REQONLINE":        33026,
-	"CMT_REQWARNUP":        33027,
-	"CMT_REQDEVICELIST":    33029,
-	"CMT_REQOP":            33030,
-	"CMT_REQSETDEVICENAME": 33032,
-	"CMT_REQCHANGEPASSWD":  33033,
-	"CMT_REQDELDEVICE":     33040,
+	"CMT_INVALID":                 0,
+	"CMT_REQ_LOGIN":               1,
+	"CMT_REP_ONLINE":              2,
+	"CMT_REP_ADD_DEL_DEVICE":      5,
+	"CMT_REP_WARNUP":              6,
+	"CMT_REP_SETNAME":             8,
+	"CMT_REP_DEL_DEVICE":          10,
+	"CMT_REP_DEVICE_ATTR":         11,
+	"CMT_REP_DEPLOYMENT":          15,
+	"CMT_REP_ONOFF":               19,
+	"CMT_REP_DEVICE_ONLINE":       21,
+	"CMT_REP_ONOFF_STATUS":        22,
+	"CMT_REP_LOGIN":               32769,
+	"CMT_REQ_ONLINE":              32770,
+	"CMT_REQ_SETNAME":             32776,
+	"CMT_REQ_DEL_DEVICE":          32778,
+	"CMT_REQ_DEVICE_ATTR":         32779,
+	"CMT_REQ_DEVICE_IDENTIFY":     32780,
+	"CMT_REQ_DEVICE_WARN":         32781,
+	"CMT_REQ_DEPLOYMENT":          32783,
+	"CMT_REQ_DEVICE_LEVELCONTROL": 32785,
+	"CMT_REQ_ONOFF":               32787,
+	"CMT_REQ_DEVICE_ONLINE":       32789,
+	"CMT_REQ_ONOFF_STATUS":        32790,
 }
 
 func (x Command_CommandType) String() string {

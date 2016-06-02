@@ -27,8 +27,9 @@ type Conn struct {
 	packetNsqReceiveChan chan gotcp.Packet
 	closeChan            chan bool
 	index                uint32
-	uid                  uint64
-	status               uint8
+	ID                   uint64
+	Status               uint8
+	Gateway              *Gateway
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
@@ -42,7 +43,7 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
 		closeChan:            make(chan bool),
 		index:                0,
-		status:               ConnUnauth,
+		Status:               ConnUnauth,
 	}
 }
 
@@ -54,9 +55,6 @@ func (c *Conn) Close() {
 	close(c.closeChan)
 }
 
-func (c *Conn) GetGatewayID() uint64 {
-	return c.uid
-}
 func (c *Conn) GetBuffer() *bytes.Buffer {
 	return c.recieveBuffer
 }
@@ -158,7 +156,8 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
 	switch shaPacket.Type {
 	case Login:
-		c.AsyncWritePacket(shaPacket, time.Second)
+		//	c.AsyncWritePacket(shaPacket, time.Second)
+		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 	case HeartBeat:
 		c.AsyncWritePacket(shaPacket, time.Second)
 	case SendDeviceList:

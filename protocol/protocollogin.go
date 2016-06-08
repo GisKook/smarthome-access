@@ -2,12 +2,13 @@ package protocol
 
 import (
 	"encoding/binary"
+	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
 )
 
 type LoginPacket struct {
-	Gateway *sha.Gateway
+	Gateway *base.Gateway
 }
 
 func (p *LoginPacket) Serialize() []byte {
@@ -34,8 +35,8 @@ func (p *LoginPacket) Serialize() []byte {
 	return data
 }
 
-func ParseLogin(buffer []byte, c *Conn) *LoginPacket {
-	gatewayid, reader := sha.GetGatewayID(buffer)
+func ParseLogin(buffer []byte) *LoginPacket {
+	gatewayid, reader := GetGatewayID(buffer)
 
 	gatewaynamelen, _ := reader.ReadByte()
 	gatewayname_byte := make([]byte, gatewaynamelen)
@@ -45,34 +46,31 @@ func ParseLogin(buffer []byte, c *Conn) *LoginPacket {
 	devicecount_byte := make([]byte, 2)
 	reader.Read(devicecount_byte)
 	devicecount := binary.BigEndian.Uint16(devicecount_byte)
-	devicelist := make([]sha.Device, devicecount)
+	devicelist := make([]base.Device, devicecount)
 	for i := 0; uint16(i) < devicecount; i++ {
-		devicelist[i].ID = sha.ReadQuaWord(reader)
-		device_name_len, _ = reader.ReadByte()
+		devicelist[i].ID = base.ReadQuaWord(reader)
+		device_name_len, _ := reader.ReadByte()
 		device_name_byte := make([]byte, device_name_len)
 		reader.Read(device_name_byte)
-		endpoint_count := read.ReadByte()
-		endpoints := make(&sha.Endpoint, endpoint_count)
+		endpoint_count, _ := reader.ReadByte()
+		endpoints := make([]base.Endpoint, endpoint_count)
 		for j := 0; byte(j) < endpoint_count; j++ {
-			endpoints[j].Endpoint, _ = read.ReadByte()
-			endpoints[j].DeviceTypeID = sha.ReadWord()
+			endpoints[j].Endpoint, _ = reader.ReadByte()
+			endpoints[j].DeviceTypeID = base.ReadWord(reader)
 			if endpoints[j].DeviceTypeID == 0x0402 {
-				endpoints[j].Zonetype = sha.ReadWord()
+				endpoints[j].Zonetype = base.ReadWord(reader)
 			}
 		}
 		devicelist[i].Endpoints = endpoints
 	}
 
-	c.ID = gatewayid
-	NewConns().Add(c)
-
 	return &LoginPacket{
-		Gateway: &sha.Gateway{
+		Gateway: &base.Gateway{
 			ID:              gatewayid,
 			Name:            string(gatewayname_byte),
 			BoxVersion:      boxversion,
 			ProtocolVersion: protocolversion,
-			Devices:         DeviceList,
+			Devices:         devicelist,
 		},
 	}
 

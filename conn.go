@@ -3,6 +3,8 @@ package sha
 import (
 	"bytes"
 	"github.com/giskook/gotcp"
+	"github.com/giskook/smarthome-access/base"
+	"github.com/giskook/smarthome-access/protocol"
 	"log"
 	"time"
 )
@@ -29,7 +31,7 @@ type Conn struct {
 	index                uint32
 	ID                   uint64
 	Status               uint8
-	Gateway              *Gateway
+	Gateway              *base.Gateway
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
@@ -88,10 +90,6 @@ func (c *Conn) UpdateWriteflag() {
 	c.writeflag = time.Now().Unix()
 }
 
-func (c *Conn) SetStatus(status uint8) {
-	c.status = status
-}
-
 func (c *Conn) checkHeart() {
 	defer func() {
 		c.conn.Close()
@@ -110,8 +108,8 @@ func (c *Conn) checkHeart() {
 				log.Println("write limit")
 				return
 			}
-			if c.status == ConnUnauth {
-				log.Printf("unauth's gateway gatewayid %d\n", c.uid)
+			if c.Status == ConnUnauth {
+				log.Printf("unauth's gateway gatewayid %x\n", c.ID)
 				return
 			}
 		case <-c.closeChan:
@@ -148,30 +146,16 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData().(*Conn)
 	conn.Close()
-	NewConns().Remove(conn.GetGatewayID())
-	NewGatewayHub().Remove(conn.GetGatewayID())
+	NewConns().Remove(conn.ID)
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
 	switch shaPacket.Type {
-	case Login:
+	case protocol.Login:
 		//	c.AsyncWritePacket(shaPacket, time.Second)
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case HeartBeat:
-		c.AsyncWritePacket(shaPacket, time.Second)
-	case SendDeviceList:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case OperateFeedback:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case Warn:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case AddDelDevice:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case SetDevicenameFeedback:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-	case DelDeviceFeedback:
-		GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
+	case protocol.HeartBeat:
+		//GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 
 	}
 

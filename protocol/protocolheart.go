@@ -1,7 +1,7 @@
-package sha
+package protocol
 
 import (
-	"encoding/binary"
+	"github.com/giskook/smarthome-access/base"
 )
 
 type HeartPacket struct {
@@ -15,7 +15,7 @@ func (p *HeartPacket) Serialize() []byte {
 	buf = append(buf, 0x0B)
 	buf = append(buf, 0x80)
 	buf = append(buf, 0x02)
-	buf = append(buf, WriteMac(p.ID))
+	buf = append(buf, base.WriteMac(p.ID)...)
 	buf = append(buf, CheckSum(buf, uint16(len(buf))))
 	buf = append(buf, 0xCE)
 
@@ -23,7 +23,7 @@ func (p *HeartPacket) Serialize() []byte {
 }
 
 func ParseHeart(buffer []byte) *HeartPacket {
-	gatewayid, reader := sha.GetGatewayID(buffer)
+	gatewayid, reader := GetGatewayID(buffer)
 	reader.ReadByte()
 	reader.ReadByte()
 

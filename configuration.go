@@ -12,15 +12,6 @@ type NsqConfiguration struct {
 	Downchannel string
 }
 
-type DatabaseConfiguration struct {
-	Host         string
-	Port         string
-	User         string
-	Passwd       string
-	Dbname       string
-	Monitortable string
-}
-
 type ServerConfiguration struct {
 	ReadLimit         int64
 	WriteLimit        int64
@@ -31,7 +22,6 @@ type ServerConfiguration struct {
 
 type Configuration struct {
 	NsqConfig    *NsqConfiguration
-	DbConfig     *DatabaseConfiguration
 	ServerConfig *ServerConfiguration
 }
 

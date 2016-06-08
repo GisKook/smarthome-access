@@ -48,45 +48,15 @@ func main() {
 	}
 	nsqcserver := sha.NewNsqConsumer(nsqcconfig, nsqpserver)
 
-	// database passwd_monitor
-	dbconfig := &sha.DBConfig{
-		Host:   configuration.DbConfig.Host,
-		Port:   configuration.DbConfig.Port,
-		User:   configuration.DbConfig.User,
-		Passwd: configuration.DbConfig.Passwd,
-		Dbname: configuration.DbConfig.Dbname,
-	}
-
-	database, dberr := sha.NewExecDatabase(dbconfig)
-	if dberr != nil {
-		log.Println(dberr.Error())
-	} else {
-		log.Println("conn to database success")
-	}
-
 	// create sha server
 	shaserverconfig := &sha.ServerConfig{
 		Listener:      listener,
 		AcceptTimeout: time.Duration(configuration.ServerConfig.ConnTimeout) * time.Second,
 		Uptopic:       configuration.NsqConfig.UpTopic,
 	}
-	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig, database)
+	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig)
 	sha.SetServer(shaserver)
 	shaserver.Start()
-
-	userhub, err := sha.NewUserPasswdHub(dbconfig)
-	sha.SetUserPasswdHub(userhub)
-	err = userhub.LoadAll()
-	if err != nil {
-		fmt.Println("connect to db error " + err.Error())
-		return
-	}
-	fmt.Println("user info has been loaded")
-	err = userhub.Listen(configuration.DbConfig.Monitortable)
-	if err != nil {
-		panic(err)
-	}
-	go userhub.WaitForNotification()
 
 	// starts service
 	fmt.Println("listening:", listener.Addr())

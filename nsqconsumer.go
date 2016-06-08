@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/bitly/go-nsq"
-	"github.com/giskook/smarthome-access/pb"
 )
 
 type NsqConsumerConfig struct {
@@ -34,55 +33,9 @@ func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
 		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
-		log.Printf("%X   %d\n", gatewayid, command.Type)
+		log.Printf("%X   %d %d\n", gatewayid, command.Type, serialnum)
 		if err == nil {
-			if command.Type != Report.Command_CMT_REQLOGIN && !NewGatewayHub().Check(gatewayid) {
-				return nil
-			}
 			switch command.Type {
-			case Report.Command_CMT_REQLOGIN:
-				packet := ParseNsqLogin(gatewayid, serialnum, command)
-				if packet != nil {
-					log.Println("nsq log")
-					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
-				}
-			case Report.Command_CMT_REQDEVICELIST:
-				packet := ParseNsqDeviceList(gatewayid, serialnum, command)
-				//NewConns().GetConn(gatewayid).SendToGateway(packet)
-				if packet != nil {
-					log.Println("nsq devicelist")
-					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
-				}
-			case Report.Command_CMT_REQOP:
-				packet := ParseNsqOp(gatewayid, serialnum, command)
-				if packet != nil {
-					NewConns().GetConn(gatewayid).SendToGateway(packet)
-				}
-			case Report.Command_CMT_REQONLINE:
-				packet := ParseNsqCheckOnline(gatewayid, serialnum)
-				if packet != nil {
-					log.Println("nsq checkonline")
-					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
-				}
-			case Report.Command_CMT_REQSETDEVICENAME:
-				packet := ParseNsqSetDevicename(gatewayid, serialnum, command)
-				if packet != nil {
-					NewConns().GetConn(gatewayid).SendToGateway(packet)
-				}
-			case Report.Command_CMT_REQCHANGEPASSWD:
-				packet := ParseNsqChangePasswd(gatewayid, serialnum, command)
-				if packet != nil {
-					s.producer.Send(s.producer.GetTopic(), packet.Serialize())
-				}
-			case Report.Command_CMT_REQDELDEVICE:
-				packet, exist := ParseNsqDelDevice(gatewayid, serialnum, command)
-				if packet != nil {
-					if exist {
-						NewConns().GetConn(gatewayid).SendToGateway(packet)
-					} else {
-						s.producer.Send(s.producer.GetTopic(), packet.Serialize())
-					}
-				}
 			}
 		}
 

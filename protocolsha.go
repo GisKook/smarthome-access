@@ -2,20 +2,7 @@ package sha
 
 import (
 	"github.com/giskook/gotcp"
-)
-
-var (
-	Illegal  uint16 = 0
-	HalfPack uint16 = 255
-
-	Login                 uint16 = 1
-	HeartBeat             uint16 = 2
-	SendDeviceList        uint16 = 3
-	OperateFeedback       uint16 = 4
-	AddDelDevice          uint16 = 5
-	Warn                  uint16 = 6
-	SetDevicenameFeedback uint16 = 8
-	DelDeviceFeedback     uint16 = 10
+	"github.com/giskook/smarthome-access/protocol"
 )
 
 type ShaPacket struct {
@@ -25,22 +12,10 @@ type ShaPacket struct {
 
 func (this *ShaPacket) Serialize() []byte {
 	switch this.Type {
-	case Login:
-		return this.Packet.(*LoginPacket).Serialize()
-	case HeartBeat:
-		return this.Packet.(*HeartPacket).Serialize()
-	case SendDeviceList:
-		return this.Packet.(*DeviceListPacket).Serialize()
-	case OperateFeedback:
-		return this.Packet.(*FeedbackPacket).Serialize()
-	case Warn:
-		return this.Packet.(*WarnPacket).Serialize()
-	case AddDelDevice:
-		return this.Packet.(*AddDelDevicePacket).Serialize()
-	case SetDevicenameFeedback:
-		return this.Packet.(*FeedbackSetDevicenamePacket).Serialize()
-	case DelDeviceFeedback:
-		return this.Packet.(*FeedbackDelDevicePacket).Serialize()
+	case protocol.Login:
+		return this.Packet.(*protocol.LoginPacket).Serialize()
+	case protocol.HeartBeat:
+		return this.Packet.(*protocol.HeartPacket).Serialize()
 	}
 
 	return nil
@@ -75,38 +50,20 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			return nil, gotcp.ErrConnClosing
 		} else {
 			buffer.Write(data[0:readLengh])
-			cmdid, pkglen := CheckProtocol(buffer)
+			cmdid, pkglen := protocol.CheckProtocol(buffer)
 
 			pkgbyte := make([]byte, pkglen)
 			buffer.Read(pkgbyte)
 			switch cmdid {
-			case Login:
-				pkg := ParseLogin(pkgbyte, smconn)
-				return NewShaPacket(Login, pkg), nil
-			case HeartBeat:
-				pkg := ParseHeart(pkgbyte)
-				return NewShaPacket(HeartBeat, pkg), nil
-			case SendDeviceList:
-				pkg := ParseDeviceList(pkgbyte, smconn)
-				return NewShaPacket(SendDeviceList, pkg), nil
-			case OperateFeedback:
-				pkg := ParseFeedback(pkgbyte)
-				return NewShaPacket(OperateFeedback, pkg), nil
-			case Warn:
-				pkg := ParseWarn(pkgbyte)
-				return NewShaPacket(Warn, pkg), nil
-			case AddDelDevice:
-				pkg := ParseAddDelDevice(pkgbyte)
-				return NewShaPacket(AddDelDevice, pkg), nil
-			case SetDevicenameFeedback:
-				pkg := ParseFeedbackSetDevicename(pkgbyte)
-				return NewShaPacket(SetDevicenameFeedback, pkg), nil
-			case DelDeviceFeedback:
-				pkg := ParseFeedbackDelDevice(pkgbyte)
-				return NewShaPacket(DelDeviceFeedback, pkg), nil
+			case protocol.Login:
+				pkg := protocol.ParseLogin(pkgbyte)
+				return NewShaPacket(protocol.Login, pkg), nil
+			case protocol.HeartBeat:
+				pkg := protocol.ParseHeart(pkgbyte)
+				return NewShaPacket(protocol.HeartBeat, pkg), nil
 
-			case Illegal:
-			case HalfPack:
+			case protocol.Illegal:
+			case protocol.HalfPack:
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package sha
 import (
 	"github.com/giskook/gotcp"
 	"github.com/giskook/smarthome-access/protocol"
+	"log"
 )
 
 type ShaPacket struct {
@@ -41,7 +42,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	for {
 		data := make([]byte, 2048)
 		readLengh, err := conn.Read(data)
-
+		log.Printf("<IN>    %x\n", data[0:readLengh])
 		if err != nil {
 			return nil, err
 		}
@@ -51,6 +52,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		} else {
 			buffer.Write(data[0:readLengh])
 			cmdid, pkglen := protocol.CheckProtocol(buffer)
+			log.Printf("<INFO>  protocol %d\n", cmdid)
 
 			pkgbyte := make([]byte, pkglen)
 			buffer.Read(pkgbyte)

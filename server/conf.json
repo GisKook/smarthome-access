@@ -6,10 +6,11 @@
 			"Downchannel":"ch"
 	},
 	"ServerConfig":{
+		"BindPort":"8788",
 		"ReadLimit":300,
-		"WriteLimit":3000000,
-		"ConnTimeout":5,
-		"ConnCheckInterval":6,
-		"ServerStatistics":10
+		"WriteLimit":300,
+		"ConnTimeout":300,
+		"ConnCheckInterval":300,
+		"ServerStatistics":300
 	}
 }

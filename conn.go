@@ -13,10 +13,10 @@ var ConnSuccess uint8 = 0
 var ConnUnauth uint8 = 1
 
 type ConnConfig struct {
-	HeartBeat    uint8
-	ReadLimit    int64
-	WriteLimit   int64
-	NsqChanLimit int32
+	ConnCheckInterval uint16
+	ReadLimit         uint16
+	WriteLimit        uint16
+	NsqChanLimit      uint16
 }
 
 type Conn struct {
@@ -41,7 +41,7 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		config:               config,
 		readflag:             time.Now().Unix(),
 		writeflag:            time.Now().Unix(),
-		ticker:               time.NewTicker(time.Duration(config.HeartBeat) * time.Second),
+		ticker:               time.NewTicker(time.Duration(config.ConnCheckInterval) * time.Second),
 		packetNsqReceiveChan: make(chan gotcp.Packet, config.NsqChanLimit),
 		closeChan:            make(chan bool),
 		index:                0,
@@ -100,11 +100,11 @@ func (c *Conn) checkHeart() {
 		select {
 		case <-c.ticker.C:
 			now = time.Now().Unix()
-			if now-c.readflag > c.config.ReadLimit {
+			if now-c.readflag > int64(c.config.ReadLimit) {
 				log.Println("read linmit")
 				return
 			}
-			if now-c.writeflag > c.config.WriteLimit {
+			if now-c.writeflag > int64(c.config.WriteLimit) {
 				log.Println("write limit")
 				return
 			}
@@ -126,13 +126,13 @@ func (c *Conn) Do() {
 type Callback struct{}
 
 func (this *Callback) OnConnect(c *gotcp.Conn) bool {
-	heartbeat := GetConfiguration().GetServerConnCheckInterval()
+	checkinterval := GetConfiguration().GetServerConnCheckInterval()
 	readlimit := GetConfiguration().GetServerReadLimit()
 	writelimit := GetConfiguration().GetServerWriteLimit()
 	config := &ConnConfig{
-		HeartBeat:  uint8(heartbeat),
-		ReadLimit:  int64(readlimit),
-		WriteLimit: int64(writelimit),
+		ConnCheckInterval: uint16(checkinterval),
+		ReadLimit:         uint16(readlimit),
+		WriteLimit:        uint16(writelimit),
 	}
 	conn := NewConn(c, config)
 

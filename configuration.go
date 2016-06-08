@@ -13,11 +13,12 @@ type NsqConfiguration struct {
 }
 
 type ServerConfiguration struct {
-	ReadLimit         int64
-	WriteLimit        int64
-	ConnTimeout       uint8
-	ConnCheckInterval uint8
-	ServerStatistics  uint32
+	BindPort          string
+	ReadLimit         uint16
+	WriteLimit        uint16
+	ConnTimeout       uint16
+	ConnCheckInterval uint16
+	ServerStatistics  uint16
 }
 
 type Configuration struct {
@@ -34,19 +35,19 @@ func ReadConfig(confpath string) (*Configuration, error) {
 	return &configuration, err
 }
 
-func (conf *Configuration) GetServerReadLimit() int64 {
+func (conf *Configuration) GetServerReadLimit() uint16 {
 	return conf.ServerConfig.ReadLimit
 }
 
-func (conf *Configuration) GetServerWriteLimit() int64 {
+func (conf *Configuration) GetServerWriteLimit() uint16 {
 	return conf.ServerConfig.WriteLimit
 }
 
-func (conf *Configuration) GetServerConnCheckInterval() uint8 {
+func (conf *Configuration) GetServerConnCheckInterval() uint16 {
 	return conf.ServerConfig.ConnCheckInterval
 }
 
-func (conf *Configuration) GetServerStatistics() uint32 {
+func (conf *Configuration) GetServerStatistics() uint16 {
 	return conf.ServerConfig.ServerStatistics
 }
 

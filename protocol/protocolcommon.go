@@ -9,8 +9,9 @@ var (
 	Illegal  uint16 = 0
 	HalfPack uint16 = 255
 
-	Login     uint16 = 1
-	HeartBeat uint16 = 2
+	Login          uint16 = 1
+	HeartBeat      uint16 = 2
+	Add_Del_Device uint16 = 5
 )
 
 func GetGatewayID(buffer []byte) (uint64, *bytes.Reader) {
@@ -32,6 +33,7 @@ func CheckSum(cmd []byte, cmdlen uint16) byte {
 	return temp
 }
 func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
+	//log.Printf("check protocol %x\n", buffer.Bytes())
 	bufferlen := buffer.Len()
 	if bufferlen == 0 {
 		return Illegal, 0

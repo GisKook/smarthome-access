@@ -56,10 +56,9 @@ func main() {
 	}
 	shaserver := sha.NewServer(srv, nsqpserver, nsqcserver, shaserverconfig)
 	sha.SetServer(shaserver)
-	shaserver.Start()
-
 	// starts service
 	fmt.Println("listening:", listener.Addr())
+	shaserver.Start()
 
 	// catchs system signal
 	chSig := make(chan os.Signal)
@@ -67,7 +66,7 @@ func main() {
 	fmt.Println("Signal: ", <-chSig)
 
 	// stops service
-	srv.Stop()
+	shaserver.Stop()
 }
 
 func checkError(err error) {

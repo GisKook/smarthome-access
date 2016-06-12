@@ -17,6 +17,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*protocol.LoginPacket).Serialize()
 	case protocol.HeartBeat:
 		return this.Packet.(*protocol.HeartPacket).Serialize()
+	case protocol.Add_Del_Device:
+		return this.Packet.(*protocol.Add_Del_Device).Serialize()
 	}
 
 	return nil
@@ -63,6 +65,9 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			case protocol.HeartBeat:
 				pkg := protocol.ParseHeart(pkgbyte)
 				return NewShaPacket(protocol.HeartBeat, pkg), nil
+			case protocol.Add_Del_Device:
+				pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Add_Del_Device, pkg), nil
 
 			case protocol.Illegal:
 			case protocol.HalfPack:

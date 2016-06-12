@@ -58,8 +58,8 @@ func (s *Server) Start() {
 	go s.nsqproducer.Start()
 	go s.nsqconsumer.Start()
 
-	go s.srv.Start(s.config.Listener, s.config.AcceptTimeout)
 	go s.checkStatistics()
+	s.srv.Start(s.config.Listener, s.config.AcceptTimeout)
 }
 
 func (s *Server) Stop() {

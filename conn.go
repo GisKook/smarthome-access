@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/giskook/gotcp"
 	"github.com/giskook/smarthome-access/base"
-	"github.com/giskook/smarthome-access/protocol"
 	"log"
 	"time"
 )
@@ -121,43 +120,4 @@ func (c *Conn) checkHeart() {
 func (c *Conn) Do() {
 	go c.checkHeart()
 	go c.writeToclientLoop()
-}
-
-type Callback struct{}
-
-func (this *Callback) OnConnect(c *gotcp.Conn) bool {
-	checkinterval := GetConfiguration().GetServerConnCheckInterval()
-	readlimit := GetConfiguration().GetServerReadLimit()
-	writelimit := GetConfiguration().GetServerWriteLimit()
-	config := &ConnConfig{
-		ConnCheckInterval: uint16(checkinterval),
-		ReadLimit:         uint16(readlimit),
-		WriteLimit:        uint16(writelimit),
-	}
-	conn := NewConn(c, config)
-
-	c.PutExtraData(conn)
-
-	conn.Do()
-
-	return true
-}
-
-func (this *Callback) OnClose(c *gotcp.Conn) {
-	conn := c.GetExtraData().(*Conn)
-	conn.Close()
-	NewConns().Remove(conn.ID)
-}
-
-func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
-	shaPacket := p.(*ShaPacket)
-	switch shaPacket.Type {
-	case protocol.Login:
-		//	c.AsyncWritePacket(shaPacket, time.Second)
-	case protocol.HeartBeat:
-		//GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
-
-	}
-
-	return true
 }

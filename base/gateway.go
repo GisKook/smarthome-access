@@ -23,16 +23,26 @@ type Gateway struct {
 }
 
 func Gateway_Add_Device(gateway *Gateway, device *Device) {
-	Apppend(gateway.Devices, device)
+	gateway.Devices = append(gateway.Devices, *device)
 }
 
 func Gateway_Del_Device(gateway *Gateway, deviceid uint64) {
 	devicecount := len(gateway.Devices)
-	for i := 0; i < devicecount; i++ {
+	var i int = 0
+	for i = 0; i < devicecount; i++ {
 		if gateway.Devices[i].ID == deviceid {
 			break
 		}
 	}
 
-	gateway.Devices = Append(gateway.Devices[:i], gateway.Devices[i+1:]...)
+	gateway.Devices = append(gateway.Devices[:i], gateway.Devices[i+1:]...)
+}
+
+func Gateway_Set_Device_Name(gateway *Gateway, deviceid uint64, name string) {
+	device_count := len(gateway.Devices)
+	for i := 0; i < device_count; i++ {
+		if deviceid == gateway.Devices[i].ID {
+			gateway.Devices[i].Name = name
+		}
+	}
 }

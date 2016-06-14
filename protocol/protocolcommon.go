@@ -3,25 +3,33 @@ package protocol
 import (
 	"bytes"
 	"encoding/binary"
+
+	"errors"
+	"github.com/giskook/smarthome-access/pb"
+	"github.com/golang/protobuf/proto"
+	"log"
 )
 
 var (
 	Illegal  uint16 = 0
 	HalfPack uint16 = 255
 
-	Login          uint16 = 1
-	HeartBeat      uint16 = 2
-	Add_Del_Device uint16 = 5
+	Login               uint16 = 1
+	HeartBeat           uint16 = 2
+	Add_Del_Device      uint16 = 5
+	Notification        uint16 = 6
+	Feedback_SetName    uint16 = 8
+	Feedback_Del_Device uint16 = 10
+	Feedback_Query_Attr uint16 = 11
+	Feedback_Depolyment uint16 = 15
+	Feedback_OnOff      uint16 = 19
 )
 
-func GetGatewayID(buffer []byte) (uint64, *bytes.Reader) {
+func ParseHeader(buffer []byte) *bytes.Reader {
 	reader := bytes.NewReader(buffer)
 	reader.Seek(5, 0)
-	uid := make([]byte, 6)
-	reader.Read(uid)
-	gid := []byte{0, 0}
-	gid = append(gid, uid...)
-	return binary.BigEndian.Uint64(gid), reader
+
+	return reader
 }
 
 func CheckSum(cmd []byte, cmdlen uint16) byte {
@@ -69,4 +77,19 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 	}
 
 	return Illegal, 0
+}
+
+func CheckNsqProtocol(message []byte) (uint64, uint32, *Report.Command, error) {
+	command := &Report.ControlReport{}
+	err := proto.Unmarshal(message, command)
+	if err != nil {
+		log.Println("unmarshal error")
+		return 0, 0, nil, errors.New("unmarshal error")
+	} else {
+		gatewayid := command.Tid
+		serialnum := command.SerialNumber
+		cmd := command.GetCommand()
+
+		return gatewayid, serialnum, cmd, nil
+	}
 }

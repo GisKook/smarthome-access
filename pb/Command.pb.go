@@ -31,7 +31,7 @@ const (
 	Command_CMT_REQ_LOGIN          Command_CommandType = 1
 	Command_CMT_REP_ONLINE         Command_CommandType = 2
 	Command_CMT_REP_ADD_DEL_DEVICE Command_CommandType = 5
-	Command_CMT_REP_WARNUP         Command_CommandType = 6
+	Command_CMT_REP_NOTIFICATION   Command_CommandType = 6
 	Command_CMT_REP_SETNAME        Command_CommandType = 8
 	Command_CMT_REP_DEL_DEVICE     Command_CommandType = 10
 	Command_CMT_REP_DEVICE_ATTR    Command_CommandType = 11
@@ -39,6 +39,7 @@ const (
 	Command_CMT_REP_ONOFF          Command_CommandType = 19
 	Command_CMT_REP_DEVICE_ONLINE  Command_CommandType = 21
 	Command_CMT_REP_ONOFF_STATUS   Command_CommandType = 22
+	Command_CMT_REP_DEVICELIST     Command_CommandType = 2049
 	// web->gateway
 	Command_CMT_REP_LOGIN               Command_CommandType = 32769
 	Command_CMT_REQ_ONLINE              Command_CommandType = 32770
@@ -52,6 +53,7 @@ const (
 	Command_CMT_REQ_ONOFF               Command_CommandType = 32787
 	Command_CMT_REQ_DEVICE_ONLINE       Command_CommandType = 32789
 	Command_CMT_REQ_ONOFF_STATUS        Command_CommandType = 32790
+	Command_CMT_REQ_DEVICELIST          Command_CommandType = 34817
 )
 
 var Command_CommandType_name = map[int32]string{
@@ -59,7 +61,7 @@ var Command_CommandType_name = map[int32]string{
 	1:     "CMT_REQ_LOGIN",
 	2:     "CMT_REP_ONLINE",
 	5:     "CMT_REP_ADD_DEL_DEVICE",
-	6:     "CMT_REP_WARNUP",
+	6:     "CMT_REP_NOTIFICATION",
 	8:     "CMT_REP_SETNAME",
 	10:    "CMT_REP_DEL_DEVICE",
 	11:    "CMT_REP_DEVICE_ATTR",
@@ -67,6 +69,7 @@ var Command_CommandType_name = map[int32]string{
 	19:    "CMT_REP_ONOFF",
 	21:    "CMT_REP_DEVICE_ONLINE",
 	22:    "CMT_REP_ONOFF_STATUS",
+	2049:  "CMT_REP_DEVICELIST",
 	32769: "CMT_REP_LOGIN",
 	32770: "CMT_REQ_ONLINE",
 	32776: "CMT_REQ_SETNAME",
@@ -79,13 +82,14 @@ var Command_CommandType_name = map[int32]string{
 	32787: "CMT_REQ_ONOFF",
 	32789: "CMT_REQ_DEVICE_ONLINE",
 	32790: "CMT_REQ_ONOFF_STATUS",
+	34817: "CMT_REQ_DEVICELIST",
 }
 var Command_CommandType_value = map[string]int32{
 	"CMT_INVALID":                 0,
 	"CMT_REQ_LOGIN":               1,
 	"CMT_REP_ONLINE":              2,
 	"CMT_REP_ADD_DEL_DEVICE":      5,
-	"CMT_REP_WARNUP":              6,
+	"CMT_REP_NOTIFICATION":        6,
 	"CMT_REP_SETNAME":             8,
 	"CMT_REP_DEL_DEVICE":          10,
 	"CMT_REP_DEVICE_ATTR":         11,
@@ -93,6 +97,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_ONOFF":               19,
 	"CMT_REP_DEVICE_ONLINE":       21,
 	"CMT_REP_ONOFF_STATUS":        22,
+	"CMT_REP_DEVICELIST":          2049,
 	"CMT_REP_LOGIN":               32769,
 	"CMT_REQ_ONLINE":              32770,
 	"CMT_REQ_SETNAME":             32776,
@@ -105,6 +110,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REQ_ONOFF":               32787,
 	"CMT_REQ_DEVICE_ONLINE":       32789,
 	"CMT_REQ_ONOFF_STATUS":        32790,
+	"CMT_REQ_DEVICELIST":          34817,
 }
 
 func (x Command_CommandType) String() string {

@@ -17,8 +17,20 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*protocol.LoginPacket).Serialize()
 	case protocol.HeartBeat:
 		return this.Packet.(*protocol.HeartPacket).Serialize()
+	case protocol.Notification:
+		return this.Packet.(*protocol.Notification).Serialize()
 	case protocol.Add_Del_Device:
-		return this.Packet.(*protocol.Add_Del_Device).Serialize()
+		return this.Packet.(*protocol.Add_Del_Device_Packet).Serialize()
+	case protocol.Feedback_SetName:
+		return this.Packet.(*protocol.Feedback_SetName_Packet).Serialize()
+	case protocol.Feedback_Del_Device:
+		return this.Packet.(*protocol.Feedback_Del_Device_Packet).Serialize()
+	case protocol.Feedback_Query_Attr:
+		return this.Packet.(*protocol.Feedback_Query_Attr_Packet).Serialize()
+	case protocol.Feedback_Depolyment:
+		return this.Packet.(*protocol.Feedback_Depolyment_Packet).Serialize()
+	case protocol.Feedback_OnOff:
+		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
 	}
 
 	return nil
@@ -63,11 +75,29 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 				pkg := protocol.ParseLogin(pkgbyte)
 				return NewShaPacket(protocol.Login, pkg), nil
 			case protocol.HeartBeat:
-				pkg := protocol.ParseHeart(pkgbyte)
+				pkg := protocol.ParseHeart(pkgbyte, smconn.ID)
 				return NewShaPacket(protocol.HeartBeat, pkg), nil
 			case protocol.Add_Del_Device:
 				pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID)
 				return NewShaPacket(protocol.Add_Del_Device, pkg), nil
+			case protocol.Notification:
+				pkg := protocol.Parse_Notification(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Notification, pkg), nil
+			case protocol.Feedback_SetName:
+				pkg := protocol.Parse_Feedback_SetName(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Feedback_SetName, pkg), nil
+			case protocol.Feedback_Del_Device:
+				pkg := protocol.Parse_Feedback_Del_Device(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Feedback_Del_Device, pkg), nil
+			case protocol.Feedback_Query_Attr:
+				pkg := protocol.Parse_Feedback_Query_Attr(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Feedback_Query_Attr, pkg), nil
+			case protocol.Feedback_Depolyment:
+				pkg := protocol.Parse_Feedback_Deployment(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Feedback_Depolyment, pkg), nil
+			case protocol.Feedback_OnOff:
+				pkg := protcol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
+				return NewShaPacket(protocol.Feedback_OnOff, pkg), nil
 
 			case protocol.Illegal:
 			case protocol.HalfPack:

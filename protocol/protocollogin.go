@@ -12,16 +12,9 @@ type LoginPacket struct {
 }
 
 func (p *LoginPacket) Serialize() []byte {
-	para := []*Report.Command_Param{
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT64,
-			Npara: p.Gateway.ID,
-		},
-	}
-
 	command := &Report.Command{
 		Type:  Report.Command_CMT_REQ_LOGIN,
-		Paras: para,
+		Paras: nil,
 	}
 
 	login := &Report.ControlReport{
@@ -36,7 +29,8 @@ func (p *LoginPacket) Serialize() []byte {
 }
 
 func ParseLogin(buffer []byte) *LoginPacket {
-	gatewayid, reader := GetGatewayID(buffer)
+	reader := ParseHeader(buffer)
+	gatewayid := base.ReadMac(reader)
 
 	gatewaynamelen, _ := reader.ReadByte()
 	gatewayname_byte := make([]byte, gatewaynamelen)

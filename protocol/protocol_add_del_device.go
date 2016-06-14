@@ -19,36 +19,32 @@ func (p *Add_Del_Device_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT64,
-			Npara: p.GatewayID,
-		},
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT64,
 			Npara: p.Device.ID,
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: p.Action,
+			Npara: uint64(p.Action),
 		},
 	}
 	if p.Action == ADD_DEVICE {
 		endpoint_count := uint8(len(p.Device.Endpoints))
-		Append(para, &Report.Command_Param{
+		para = append(para, &Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: endpoint_count,
+			Npara: uint64(endpoint_count),
 		})
 		for i := uint8(0); i < endpoint_count; i++ {
-			Append(para, &Report.Command_Param{
+			para = append(para, &Report.Command_Param{
 				Type:  Report.Command_Param_UINT8,
-				Npara: p.Device.Endpoints[i].Endpoint,
+				Npara: uint64(p.Device.Endpoints[i].Endpoint),
 			})
-			Append(para, &Report.Command_Param{
+			para = append(para, &Report.Command_Param{
 				Type:  Report.Command_Param_UINT16,
-				Npara: p.Device.Endpoints[i].DeviceTypeID,
+				Npara: uint64(p.Device.Endpoints[i].DeviceTypeID),
 			})
 			if p.Device.Endpoints[i].DeviceTypeID == base.SS_Device_DeviceTypeID {
-				Append(para, &Report.Command_Param{
+				para = append(para, &Report.Command_Param{
 					Type:  Report.Command_Param_UINT16,
-					Npara: p.Device.Endpoints[i].Zonetype,
+					Npara: uint64(p.Device.Endpoints[i].Zonetype),
 				})
 			}
 
@@ -61,33 +57,32 @@ func (p *Add_Del_Device_Packet) Serialize() []byte {
 		Paras: para,
 	}
 
-	login := &Report.ControlReport{
+	add_del_device_pkg := &Report.ControlReport{
 		Tid:          p.GatewayID,
 		SerialNumber: 0,
 		Command:      command,
 	}
 
-	data, _ := proto.Marshal(login)
+	data, _ := proto.Marshal(add_del_device_pkg)
 
 	return data
 }
 
-func Parse_Add_Del_Device(buffer []byte, uint64 id) *Add_Del_Device_Packet {
-	gatewayid, reader := sha.GetGatewayID(buffer)
-
+func Parse_Add_Del_Device(buffer []byte, id uint64) *Add_Del_Device_Packet {
+	reader := ParseHeader(buffer)
 	action, _ := reader.ReadByte()
-	deviceid := sha.ReadQuaWord(reader)
+	deviceid := base.ReadQuaWord(reader)
 	device_type_count, _ := reader.ReadByte()
 	var device base.Device
-	device.ID = id
-	for i := 0; uint16(i) < device_type_count; i++ {
+	device.ID = deviceid
+	for i := 0; byte(i) < device_type_count; i++ {
 		endpoint, _ := reader.ReadByte()
-		devicetypeid := sha.ReadWord(reader)
+		devicetypeid := base.ReadWord(reader)
 		var zonetype uint16 = 0
 		if devicetypeid == base.SS_Device_DeviceTypeID {
-			zonetype = sha.ReadWord(reader)
+			zonetype = base.ReadWord(reader)
 		}
-		Append(device.Endpoints, &Endpoint{
+		device.Endpoints = append(device.Endpoints, base.Endpoint{
 			Endpoint:     endpoint,
 			DeviceTypeID: devicetypeid,
 			Zonetype:     zonetype,
@@ -96,7 +91,6 @@ func Parse_Add_Del_Device(buffer []byte, uint64 id) *Add_Del_Device_Packet {
 
 	return &Add_Del_Device_Packet{
 		GatewayID: id,
-		DeviceID:  deviceid,
 		Action:    action,
 		Device:    &device,
 	}

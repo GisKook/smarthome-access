@@ -32,3 +32,19 @@ func WriteMac(mac uint64) []byte {
 
 	return mac_byte[2:]
 }
+
+func ReadMac(reader *bytes.Reader) uint64 {
+	mac_byte := make([]byte, 6)
+	reader.Read(mac_byte)
+	mac := []byte{0, 0}
+	mac = append(mac, mac_byte...)
+
+	return binary.BigEndian.Uint64(mac)
+}
+
+func ReadString(reader *bytes.Reader, length uint8) string {
+	string_byte := make([]byte, length)
+	reader.Read(string_byte)
+
+	return string(string_byte)
+}

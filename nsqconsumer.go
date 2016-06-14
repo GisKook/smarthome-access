@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/bitly/go-nsq"
+	"github.com/giskook/smarthome-access/protocol"
 )
 
 type NsqConsumerConfig struct {
@@ -32,7 +33,7 @@ func NewNsqConsumer(config *NsqConsumerConfig, producer *NsqProducer) *NsqConsum
 func (s *NsqConsumer) recvNsq() {
 	s.consumer.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		data := message.Body
-		gatewayid, serialnum, command, err := CheckNsqProtocol(data)
+		gatewayid, serialnum, command, err := protocol.CheckNsqProtocol(data)
 		log.Printf("%X   %d %d\n", gatewayid, command.Type, serialnum)
 		if err == nil {
 			switch command.Type {

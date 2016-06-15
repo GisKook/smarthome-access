@@ -94,12 +94,12 @@ func Parse_Feedback_Query_Attr(buffer []byte, id uint64) *Feedback_Query_Attr_Pa
 	applicationversion, _ := reader.ReadByte()
 	stackversion, _ := reader.ReadByte()
 	hwversion, _ := reader.ReadByte()
-	manufacturernamelen := reader.ReadByte()
+	manufacturernamelen, _ := reader.ReadByte()
 	manufacturername := base.ReadString(reader, manufacturernamelen)
 	modelidentifierlen, _ := reader.ReadByte()
 	modelidentifier := base.ReadString(reader, modelidentifierlen)
 	datecodelen, _ := reader.ReadByte()
-	datecode := base.ReadWord(reader, datecodelen)
+	datecode := base.ReadString(reader, datecodelen)
 	powersouce, _ := reader.ReadByte()
 
 	return &Feedback_Query_Attr_Packet{

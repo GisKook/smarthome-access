@@ -42,17 +42,19 @@ func (p *Feedback_OnOff_Packet) Serialize() []byte {
 	return data
 }
 
-func Parse_Feedback_Onoff(buffer []byte, id uint64) *Feedback_Deployment_Packet {
+func Parse_Feedback_Onoff(buffer []byte, id uint64) *Feedback_OnOff_Packet {
 	reader := ParseHeader(buffer)
 	deviceid := base.ReadQuaWord(reader)
 	clusterid := base.ReadWord(reader)
+	endpoint, _ := reader.ReadByte()
 	action, _ := reader.ReadByte()
 	result, _ := reader.ReadByte()
 
 	return &Feedback_OnOff_Packet{
 		GatewayID: id,
-		ClusterID: deviceid,
-		Endpoint:  clusterid,
+		DeviceID:  deviceid,
+		ClusterID: clusterid,
+		Endpoint:  endpoint,
 		Action:    action,
 		Result:    result,
 	}

@@ -18,7 +18,7 @@ func (this *ShaPacket) Serialize() []byte {
 	case protocol.HeartBeat:
 		return this.Packet.(*protocol.HeartPacket).Serialize()
 	case protocol.Notification:
-		return this.Packet.(*protocol.Notification).Serialize()
+		return this.Packet.(*protocol.Notification_Packet).Serialize()
 	case protocol.Add_Del_Device:
 		return this.Packet.(*protocol.Add_Del_Device_Packet).Serialize()
 	case protocol.Feedback_SetName:
@@ -28,7 +28,7 @@ func (this *ShaPacket) Serialize() []byte {
 	case protocol.Feedback_Query_Attr:
 		return this.Packet.(*protocol.Feedback_Query_Attr_Packet).Serialize()
 	case protocol.Feedback_Depolyment:
-		return this.Packet.(*protocol.Feedback_Depolyment_Packet).Serialize()
+		return this.Packet.(*protocol.Feedback_Deployment_Packet).Serialize()
 	case protocol.Feedback_OnOff:
 		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
 	}
@@ -96,7 +96,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 				pkg := protocol.Parse_Feedback_Deployment(pkgbyte, smconn.ID)
 				return NewShaPacket(protocol.Feedback_Depolyment, pkg), nil
 			case protocol.Feedback_OnOff:
-				pkg := protcol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
+				pkg := protocol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
 				return NewShaPacket(protocol.Feedback_OnOff, pkg), nil
 
 			case protocol.Illegal:

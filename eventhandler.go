@@ -40,14 +40,12 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	loginPkg := p.Packet.(*protocol.LoginPacket)
 	conn.Gateway = loginPkg.Gateway
 	conn.ID = conn.Gateway.ID
-	fmt.Printf("%+v\n", *conn.Gateway)
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
 	conn := c.GetExtraData().(*Conn)
 	add_del_device_pkg := p.Packet.(*protocol.Add_Del_Device_Packet)
 
-	fmt.Printf("%+v\n", *conn.Gateway)
 	if add_del_device_pkg.Action == protocol.ADD_DEVICE {
 		base.Gateway_Add_Device(conn.Gateway, add_del_device_pkg.Device)
 	} else if add_del_device_pkg.Action == protocol.DEL_DEVICE {

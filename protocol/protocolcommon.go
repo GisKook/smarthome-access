@@ -10,6 +10,9 @@ import (
 	"log"
 )
 
+const STARTFLAG byte = 0xCE
+const ENDFLAG byte = 0xCE
+
 var (
 	Illegal  uint16 = 0
 	HalfPack uint16 = 255

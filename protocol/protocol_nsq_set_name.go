@@ -9,7 +9,6 @@ import (
 const CMD_SET_DEVICE_NAME uint16 = 0x8008
 
 type Nsq_Set_Devcie_Name_Packet struct {
-	GatewayID uint64
 	SerialNum uint32
 	DeviceID  uint64
 	Name      string
@@ -31,12 +30,11 @@ func (p *Nsq_Set_Devcie_Name_Packet) Serialize() []byte {
 	return writer.Bytes()
 }
 
-func Parse_NSQ_Set_Device_Name(gatewayid uint64, serialnum uint32, paras []*Report.Command_Param) *Nsq_Set_Devcie_Name_Packet {
+func Parse_NSQ_Set_Device_Name(serialnum uint32, paras []*Report.Command_Param) *Nsq_Set_Devcie_Name_Packet {
 	deviceid := paras[0].Npara
 	name := paras[1].Strpara
 
 	return &Nsq_Set_Devcie_Name_Packet{
-		GatewayID: gatewayid,
 		SerialNum: serialnum,
 		DeviceID:  deviceid,
 		Name:      name,

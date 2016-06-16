@@ -36,8 +36,7 @@ func (s *NsqConsumer) recvNsq() {
 		gatewayid, serialnum, command, err := protocol.CheckNsqProtocol(data)
 		log.Printf("%X   %d %d\n", gatewayid, command.Type, serialnum)
 		if err == nil {
-			switch command.Type {
-			}
+			Nsq_EventHandler(gatewayid, serialnum, command)
 		}
 
 		return nil

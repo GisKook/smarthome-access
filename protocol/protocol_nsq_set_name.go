@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 )
@@ -15,6 +16,7 @@ type Nsq_Set_Devcie_Name_Packet struct {
 }
 
 func (p *Nsq_Set_Devcie_Name_Packet) Serialize() []byte {
+	fmt.Printf("%+v\n", p)
 	var writer bytes.Buffer
 	writer.WriteByte(STARTFLAG)
 	base.WriteWord(&writer, 0)
@@ -32,6 +34,7 @@ func (p *Nsq_Set_Devcie_Name_Packet) Serialize() []byte {
 
 func Parse_NSQ_Set_Device_Name(serialnum uint32, paras []*Report.Command_Param) *Nsq_Set_Devcie_Name_Packet {
 	deviceid := paras[0].Npara
+	fmt.Printf("%d\n", deviceid)
 	name := paras[1].Strpara
 
 	return &Nsq_Set_Devcie_Name_Packet{

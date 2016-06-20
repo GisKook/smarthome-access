@@ -28,18 +28,19 @@ type Command_CommandType int32
 const (
 	Command_CMT_INVALID Command_CommandType = 0
 	// gateway->web message
-	Command_CMT_REQ_LOGIN          Command_CommandType = 1
-	Command_CMT_REP_ONLINE         Command_CommandType = 2
-	Command_CMT_REP_ADD_DEL_DEVICE Command_CommandType = 5
-	Command_CMT_REP_NOTIFICATION   Command_CommandType = 6
-	Command_CMT_REP_SETNAME        Command_CommandType = 8
-	Command_CMT_REP_DEL_DEVICE     Command_CommandType = 10
-	Command_CMT_REP_DEVICE_ATTR    Command_CommandType = 11
-	Command_CMT_REP_DEPLOYMENT     Command_CommandType = 15
-	Command_CMT_REP_ONOFF          Command_CommandType = 19
-	Command_CMT_REP_DEVICE_ONLINE  Command_CommandType = 21
-	Command_CMT_REP_ONOFF_STATUS   Command_CommandType = 22
-	Command_CMT_REP_DEVICELIST     Command_CommandType = 2049
+	Command_CMT_REQ_LOGIN           Command_CommandType = 1
+	Command_CMT_REP_ONLINE          Command_CommandType = 2
+	Command_CMT_REP_ADD_DEL_DEVICE  Command_CommandType = 5
+	Command_CMT_REP_NOTIFICATION    Command_CommandType = 6
+	Command_CMT_REP_SETNAME         Command_CommandType = 8
+	Command_CMT_REP_DEL_DEVICE      Command_CommandType = 10
+	Command_CMT_REP_DEVICE_ATTR     Command_CommandType = 11
+	Command_CMT_REP_DEPLOYMENT      Command_CommandType = 15
+	Command_CMT_REP_ONOFF           Command_CommandType = 19
+	Command_CMT_REP_DEVICE_ONLINE   Command_CommandType = 21
+	Command_CMT_REP_ONOFF_STATUS    Command_CommandType = 22
+	Command_CMT_REP_DEVICELIST      Command_CommandType = 2049
+	Command_CMT_REP_GENERAL_OFFLINE Command_CommandType = 2050
 	// web->gateway
 	Command_CMT_REP_LOGIN               Command_CommandType = 32769
 	Command_CMT_REQ_ONLINE              Command_CommandType = 32770
@@ -70,6 +71,7 @@ var Command_CommandType_name = map[int32]string{
 	21:    "CMT_REP_DEVICE_ONLINE",
 	22:    "CMT_REP_ONOFF_STATUS",
 	2049:  "CMT_REP_DEVICELIST",
+	2050:  "CMT_REP_GENERAL_OFFLINE",
 	32769: "CMT_REP_LOGIN",
 	32770: "CMT_REQ_ONLINE",
 	32776: "CMT_REQ_SETNAME",
@@ -98,6 +100,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_DEVICE_ONLINE":       21,
 	"CMT_REP_ONOFF_STATUS":        22,
 	"CMT_REP_DEVICELIST":          2049,
+	"CMT_REP_GENERAL_OFFLINE":     2050,
 	"CMT_REP_LOGIN":               32769,
 	"CMT_REQ_ONLINE":              32770,
 	"CMT_REQ_SETNAME":             32776,

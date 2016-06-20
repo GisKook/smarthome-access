@@ -24,6 +24,7 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 	c.PutExtraData(conn)
 
 	conn.Do()
+	NewConns().Add(conn)
 
 	return true
 }
@@ -40,6 +41,8 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	loginPkg := p.Packet.(*protocol.LoginPacket)
 	conn.Gateway = loginPkg.Gateway
 	conn.ID = conn.Gateway.ID
+	NewConns().SetID(conn.ID, conn.index)
+	fmt.Printf("%+v\n", *NewConns())
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
@@ -52,14 +55,14 @@ func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
 		base.Gateway_Del_Device(conn.Gateway, conn.ID)
 	}
 	fmt.Printf("%+v\n", *conn.Gateway)
-	GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 
 func on_feedback_set_name(c *gotcp.Conn, p *ShaPacket) {
 	conn := c.GetExtraData().(*Conn)
 	feedback_set_name_pkg := p.Packet.(*protocol.Feedback_SetName_Packet)
 	base.Gateway_Set_Device_Name(conn.Gateway, feedback_set_name_pkg.DeviceID, feedback_set_name_pkg.DeviceName)
-	GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
@@ -72,19 +75,19 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		c.AsyncWritePacket(shaPacket, time.Second)
 		//GetServer().GetProducer().Send(GetServer().GetTopic(), p.Serialize())
 	case protocol.Notification:
-		GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Add_Del_Device:
 		on_add_del_device(c, shaPacket)
 	case protocol.Feedback_SetName:
 		on_feedback_set_name(c, shaPacket)
 	case protocol.Feedback_Del_Device:
-		GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_Query_Attr:
-		GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_Depolyment:
-		GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_OnOff:
-		GetServer().GetProducer().Send(NSQ_CONTROL_PUB_TOPIC, p.Serialize())
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 
 	}
 

@@ -18,7 +18,6 @@ message Command {
 		CMT_REP_DEVICE_ONLINE    = 0x0015;  // unsupport right now
 		CMT_REP_ONOFF_STATUS     = 0x0016;  // unsupport right now only for onoff deivce
 		CMT_REP_DEVICELIST       = 0x0801; 
-		CMT_REP_GENERAL_OFFLINE  = 0x0802;
 		
 		// web->gateway
 		CMT_REP_LOGIN               = 0x8001;

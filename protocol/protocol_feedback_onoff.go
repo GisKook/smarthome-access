@@ -22,6 +22,10 @@ func (p *Feedback_OnOff_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(GATEWAY_ON_LINE),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.Result),
 		},
 	}

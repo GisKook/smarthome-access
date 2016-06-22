@@ -26,6 +26,10 @@ type Feedback_Query_Attr_Packet struct {
 func (p *Feedback_Query_Attr_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(GATEWAY_ON_LINE),
+		},
+		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT16,
 			Npara: uint64(p.ShortAddr),
 		},
@@ -72,13 +76,13 @@ func (p *Feedback_Query_Attr_Packet) Serialize() []byte {
 		Paras: para,
 	}
 
-	login := &Report.ControlReport{
+	feedback_device_attr_pkg := &Report.ControlReport{
 		Tid:          p.GatewayID,
 		SerialNumber: p.SerialNum,
 		Command:      command,
 	}
 
-	data, _ := proto.Marshal(login)
+	data, _ := proto.Marshal(feedback_device_attr_pkg)
 
 	return data
 }

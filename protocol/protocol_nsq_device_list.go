@@ -6,12 +6,11 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-const GATEWAY_ONLINE uint8 = 1
-const GATEWAY_OFFLINE uint8 = 0
-
 type Nsq_Device_List_Packet struct {
-	Status  uint8
-	Gateway *base.Gateway
+	GatewayID uint64
+	SerialNum uint32
+	Status    uint8
+	Gateway   *base.Gateway
 }
 
 func (p *Nsq_Device_List_Packet) Serialize() []byte {
@@ -21,7 +20,7 @@ func (p *Nsq_Device_List_Packet) Serialize() []byte {
 			Npara: uint64(p.Status),
 		},
 	}
-	if p.Status == GATEWAY_ONLINE {
+	if p.Status == GATEWAY_ON_LINE {
 		para = append(para, &Report.Command_Param{
 			Type:    Report.Command_Param_STRING,
 			Strpara: p.Gateway.Name,
@@ -70,8 +69,8 @@ func (p *Nsq_Device_List_Packet) Serialize() []byte {
 	}
 
 	device_list_pkg := &Report.ControlReport{
-		Tid:          p.Gateway.ID,
-		SerialNumber: 0,
+		Tid:          p.GatewayID,
+		SerialNumber: p.SerialNum,
 		Command:      command,
 	}
 
@@ -80,9 +79,11 @@ func (p *Nsq_Device_List_Packet) Serialize() []byte {
 	return data
 }
 
-func Parse_Device_List(status uint8, gateway *base.Gateway) *Nsq_Device_List_Packet {
+func Parse_Device_List(gatewayid uint64, serialnum uint32, status uint8, gateway *base.Gateway) *Nsq_Device_List_Packet {
 	return &Nsq_Device_List_Packet{
-		Status:  status,
-		Gateway: gateway,
+		GatewayID: gatewayid,
+		SerialNum: serialnum,
+		Status:    status,
+		Gateway:   gateway,
 	}
 }

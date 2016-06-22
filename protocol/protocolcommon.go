@@ -12,6 +12,8 @@ import (
 
 const STARTFLAG byte = 0xCE
 const ENDFLAG byte = 0xCE
+const GATEWAY_OFF_LINE byte = 252
+const GATEWAY_ON_LINE byte = 251
 
 var (
 	Illegal  uint16 = 0

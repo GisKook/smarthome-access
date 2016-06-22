@@ -15,6 +15,20 @@ type Nsq_Identify_Packet struct {
 	Endpoint  uint8
 }
 
+func (p *Nsq_Identify_Packet) SerializeOnline() []byte {
+	var writer bytes.Buffer
+	writer.WriteByte(STARTFLAG)
+	base.WriteWord(&writer, CMD_IDENTIFY_LEN)
+	base.WriteWord(&writer, CMD_IDENTIFY)
+	base.WriteDWord(&writer, p.SerialNum)
+	base.WriteQuaWord(&writer, p.DeviceID)
+	writer.WriteByte(p.Endpoint)
+	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))
+	writer.WriteByte(ENDFLAG)
+
+	return writer.Bytes()
+}
+
 func (p *Nsq_Identify_Packet) Serialize() []byte {
 	var writer bytes.Buffer
 	writer.WriteByte(STARTFLAG)

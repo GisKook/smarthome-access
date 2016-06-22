@@ -81,7 +81,7 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 		return HalfPack, 0
 	}
 
-	return Illegal, 0
+	return HalfPack, 0
 }
 
 func CheckNsqProtocol(message []byte) (uint64, uint32, *Report.Command, error) {

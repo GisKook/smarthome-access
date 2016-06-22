@@ -31,6 +31,7 @@ type Conn struct {
 	ID                   uint64
 	Status               uint8
 	Gateway              *base.Gateway
+	ReadMore             bool
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
@@ -45,6 +46,7 @@ func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
 		closeChan:            make(chan bool),
 		index:                0,
 		Status:               ConnUnauth,
+		ReadMore:             true,
 	}
 }
 

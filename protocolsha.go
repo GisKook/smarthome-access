@@ -54,54 +54,67 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 
 	conn := c.GetRawConn()
 	for {
-		data := make([]byte, 2048)
-		readLengh, err := conn.Read(data)
-		log.Printf("<IN>    %x\n", data[0:readLengh])
-		if err != nil {
-			return nil, err
+		if smconn.ReadMore {
+			data := make([]byte, 2048)
+			readLengh, err := conn.Read(data)
+			log.Printf("<IN>    %x\n", data[0:readLengh])
+			if err != nil {
+				return nil, err
+			}
+
+			if readLengh == 0 {
+				return nil, gotcp.ErrConnClosing
+			}
+			buffer.Write(data[0:readLengh])
 		}
 
-		if readLengh == 0 {
-			return nil, gotcp.ErrConnClosing
-		} else {
-			buffer.Write(data[0:readLengh])
-			cmdid, pkglen := protocol.CheckProtocol(buffer)
-			log.Printf("<INFO>  protocol %d\n", cmdid)
+		cmdid, pkglen := protocol.CheckProtocol(buffer)
+		log.Printf("<INFO>  protocol %d\n", cmdid)
 
-			pkgbyte := make([]byte, pkglen)
-			buffer.Read(pkgbyte)
-			switch cmdid {
-			case protocol.Login:
-				pkg := protocol.ParseLogin(pkgbyte)
-				return NewShaPacket(protocol.Login, pkg), nil
-			case protocol.HeartBeat:
-				pkg := protocol.ParseHeart(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.HeartBeat, pkg), nil
-			case protocol.Add_Del_Device:
-				pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Add_Del_Device, pkg), nil
-			case protocol.Notification:
-				pkg := protocol.Parse_Notification(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Notification, pkg), nil
-			case protocol.Feedback_SetName:
-				pkg := protocol.Parse_Feedback_SetName(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Feedback_SetName, pkg), nil
-			case protocol.Feedback_Del_Device:
-				pkg := protocol.Parse_Feedback_Del_Device(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Feedback_Del_Device, pkg), nil
-			case protocol.Feedback_Query_Attr:
-				pkg := protocol.Parse_Feedback_Query_Attr(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Feedback_Query_Attr, pkg), nil
-			case protocol.Feedback_Depolyment:
-				pkg := protocol.Parse_Feedback_Deployment(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Feedback_Depolyment, pkg), nil
-			case protocol.Feedback_OnOff:
-				pkg := protocol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
-				return NewShaPacket(protocol.Feedback_OnOff, pkg), nil
+		pkgbyte := make([]byte, pkglen)
+		buffer.Read(pkgbyte)
+		switch cmdid {
+		case protocol.Login:
+			pkg := protocol.ParseLogin(pkgbyte)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Login, pkg), nil
+		case protocol.HeartBeat:
+			pkg := protocol.ParseHeart(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.HeartBeat, pkg), nil
+		case protocol.Add_Del_Device:
+			pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Add_Del_Device, pkg), nil
+		case protocol.Notification:
+			pkg := protocol.Parse_Notification(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Notification, pkg), nil
+		case protocol.Feedback_SetName:
+			pkg := protocol.Parse_Feedback_SetName(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_SetName, pkg), nil
+		case protocol.Feedback_Del_Device:
+			pkg := protocol.Parse_Feedback_Del_Device(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_Del_Device, pkg), nil
+		case protocol.Feedback_Query_Attr:
+			pkg := protocol.Parse_Feedback_Query_Attr(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_Query_Attr, pkg), nil
+		case protocol.Feedback_Depolyment:
+			pkg := protocol.Parse_Feedback_Deployment(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_Depolyment, pkg), nil
+		case protocol.Feedback_OnOff:
+			pkg := protocol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_OnOff, pkg), nil
 
-			case protocol.Illegal:
-			case protocol.HalfPack:
-			}
+		case protocol.Illegal:
+			smconn.ReadMore = true
+		case protocol.HalfPack:
+			smconn.ReadMore = true
 		}
 	}
 

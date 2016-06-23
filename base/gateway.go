@@ -46,3 +46,14 @@ func Gateway_Set_Device_Name(gateway *Gateway, deviceid uint64, name string) {
 		}
 	}
 }
+
+func Gateway_Check_Device(gateway *Gateway, deviceid uint64) bool {
+	device_count := len(gateway.Devices)
+	for i := 0; i < device_count; i++ {
+		if deviceid == gateway.Devices[i].ID {
+			return true
+		}
+	}
+
+	return false
+}

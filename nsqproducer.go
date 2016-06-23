@@ -27,6 +27,7 @@ func NewNsqProducer(config *NsqProducerConfig) *NsqProducer {
 }
 
 func (s *NsqProducer) Send(topic string, value []byte) error {
+	log.Printf("<OUT_NSQ> topic %s %x \n", topic, value)
 	err := s.producer.PublishAsync(topic, value, nil, nil)
 
 	return err

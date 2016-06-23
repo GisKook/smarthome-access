@@ -6,7 +6,6 @@ import (
 	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
-	"time"
 )
 
 const CMD_SET_DEVICE_NAME uint16 = 0x8008
@@ -69,7 +68,6 @@ func (p *Nsq_Set_Devcie_Name_Packet) Serialize() []byte {
 }
 
 func Parse_NSQ_Set_Device_Name(gatewayid uint64, serialnum uint32, status byte, paras []*Report.Command_Param) *Nsq_Set_Devcie_Name_Packet {
-	time.Sleep(10 * time.Second)
 	deviceid := paras[0].Npara
 	fmt.Printf("%d\n", deviceid)
 	name := paras[1].Strpara

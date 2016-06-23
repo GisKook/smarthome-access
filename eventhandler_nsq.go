@@ -67,7 +67,7 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			pkg := protocol.Parse_Device_List(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, NewConns().GetConn(gatewayid).Gateway)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		} else {
-			pkg := protocol.Parse_Device_List(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, NewConns().GetConn(gatewayid).Gateway)
+			pkg := protocol.Parse_Device_List(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, nil)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
 	}

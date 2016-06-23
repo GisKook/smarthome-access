@@ -42,7 +42,6 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	conn.Gateway = loginPkg.Gateway
 	conn.ID = conn.Gateway.ID
 	NewConns().SetID(conn.ID, conn.index)
-	fmt.Printf("%+v\n", *NewConns())
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
@@ -50,18 +49,24 @@ func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
 	add_del_device_pkg := p.Packet.(*protocol.Add_Del_Device_Packet)
 
 	if add_del_device_pkg.Action == protocol.ADD_DEVICE {
-		base.Gateway_Add_Device(conn.Gateway, add_del_device_pkg.Device)
+		if !base.Gateway_Check_Device(conn.Gateway, add_del_device_pkg.Device.ID) {
+			base.Gateway_Add_Device(conn.Gateway, add_del_device_pkg.Device)
+			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+		}
 	} else if add_del_device_pkg.Action == protocol.DEL_DEVICE {
-		base.Gateway_Del_Device(conn.Gateway, conn.ID)
+		if base.Gateway_Check_Device(conn.Gateway, add_del_device_pkg.Device.ID) {
+			base.Gateway_Del_Device(conn.Gateway, conn.ID)
+			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+		}
 	}
-	fmt.Printf("%+v\n", *conn.Gateway)
-	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 
 func on_feedback_set_name(c *gotcp.Conn, p *ShaPacket) {
 	conn := c.GetExtraData().(*Conn)
 	feedback_set_name_pkg := p.Packet.(*protocol.Feedback_SetName_Packet)
 	base.Gateway_Set_Device_Name(conn.Gateway, feedback_set_name_pkg.DeviceID, feedback_set_name_pkg.DeviceName)
+	fmt.Printf("%+v\n", conn.Gateway)
+	fmt.Printf("dviceid %d\n", feedback_set_name_pkg.DeviceID)
 	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 

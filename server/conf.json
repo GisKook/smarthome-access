@@ -6,9 +6,9 @@
 			"Downchannel":"ch"
 	},
 	"ServerConfig":{
-		"BindPort":"8788",
+		"BindPort":"8787",
 		"ReadLimit":300,
-		"WriteLimit":300,
+		"WriteLimit":30000,
 		"ConnTimeout":300,
 		"ConnCheckInterval":300,
 		"ServerStatistics":300

@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"fmt"
 	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
@@ -24,6 +25,7 @@ type Feedback_Query_Attr_Packet struct {
 }
 
 func (p *Feedback_Query_Attr_Packet) Serialize() []byte {
+	fmt.Printf("%+v\n", p)
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
@@ -93,7 +95,9 @@ func Parse_Feedback_Query_Attr(buffer []byte, id uint64) *Feedback_Query_Attr_Pa
 	deviceid := base.ReadQuaWord(reader)
 	endpoint, _ := reader.ReadByte()
 	shortaddr := base.ReadWord(reader)
+	fmt.Printf("shortaddr %d\n", shortaddr)
 	profileid := base.ReadWord(reader)
+	fmt.Printf("prifileid %d\n", profileid)
 	zclversion, _ := reader.ReadByte()
 	applicationversion, _ := reader.ReadByte()
 	stackversion, _ := reader.ReadByte()

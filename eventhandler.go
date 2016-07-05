@@ -32,7 +32,7 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData().(*Conn)
 	conn.Close()
-	NewConns().Remove(conn.ID)
+	NewConns().Remove(conn)
 }
 
 func on_login(c *gotcp.Conn, p *ShaPacket) {
@@ -42,6 +42,7 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	conn.Gateway = loginPkg.Gateway
 	conn.ID = conn.Gateway.ID
 	NewConns().SetID(conn.ID, conn.index)
+	c.AsyncWritePacket(p, time.Second)
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {

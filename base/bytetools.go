@@ -49,6 +49,10 @@ func WriteMac(mac uint64) []byte {
 	return mac_byte[2:]
 }
 
+func WriteMacBytes(writer *bytes.Buffer, mac uint64) {
+	writer.Write(WriteMac(mac))
+}
+
 func WriteWord(writer *bytes.Buffer, word uint16) {
 	word_byte := make([]byte, 2)
 	binary.BigEndian.PutUint16(word_byte, word)

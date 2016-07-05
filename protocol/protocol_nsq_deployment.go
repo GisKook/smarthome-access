@@ -82,9 +82,9 @@ func Parse_NSQ_Deployment(gatewayid uint64, serialnum uint32, status byte, paras
 	deviceid := paras[0].Npara
 	endpint := uint8(paras[1].Npara)
 	armmode := uint8(paras[2].Npara)
-	armstarthour := uint8(paras[3].Npara)
+	armstarthour := (uint8(paras[3].Npara) + 24 - 8) % 24
 	armstartmin := uint8(paras[4].Npara)
-	armendhour := uint8(paras[5].Npara)
+	armendhour := (uint8(paras[5].Npara) + 24 - 8) % 24
 	armendmin := uint8(paras[6].Npara)
 
 	return &Nsq_Deployment_Packet{

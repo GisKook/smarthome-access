@@ -43,8 +43,8 @@ func (p *Feedback_Deployment_Packet) Serialize() []byte {
 
 func Parse_Feedback_Deployment(buffer []byte, id uint64) *Feedback_Deployment_Packet {
 	reader := ParseHeader(buffer)
-	deviceid := base.ReadQuaWord(reader)
 	serialnum := base.ReadDWord(reader)
+	deviceid := base.ReadQuaWord(reader)
 	result, _ := reader.ReadByte()
 
 	return &Feedback_Deployment_Packet{

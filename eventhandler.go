@@ -94,6 +94,8 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_OnOff:
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Feedback_Level_Control:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 
 	}
 

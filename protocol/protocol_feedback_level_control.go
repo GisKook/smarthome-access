@@ -6,10 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-const ON uint8 = 1
-const OFF uint8 = 0
-
-type Feedback_OnOff_Packet struct {
+type Feedback_Level_Control_Packet struct {
 	GatewayID uint64
 	SerialNum uint32
 	DeviceID  uint64
@@ -18,7 +15,7 @@ type Feedback_OnOff_Packet struct {
 	Result    uint8
 }
 
-func (p *Feedback_OnOff_Packet) Serialize() []byte {
+func (p *Feedback_Level_Control_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
@@ -35,18 +32,18 @@ func (p *Feedback_OnOff_Packet) Serialize() []byte {
 		Paras: para,
 	}
 
-	feedback_onoff_pkg := &Report.ControlReport{
+	feedback_level_control_pkg := &Report.ControlReport{
 		Tid:          p.GatewayID,
 		SerialNumber: p.SerialNum,
 		Command:      command,
 	}
 
-	data, _ := proto.Marshal(feedback_onoff_pkg)
+	data, _ := proto.Marshal(feedback_level_control_pkg)
 
 	return data
 }
 
-func Parse_Feedback_Onoff(buffer []byte, id uint64) *Feedback_OnOff_Packet {
+func Parse_Feedback_Level_Control(buffer []byte, id uint64) *Feedback_Level_Control_Packet {
 	reader := ParseHeader(buffer)
 	serialnum := base.ReadDWord(reader)
 	deviceid := base.ReadQuaWord(reader)
@@ -54,7 +51,7 @@ func Parse_Feedback_Onoff(buffer []byte, id uint64) *Feedback_OnOff_Packet {
 	action, _ := reader.ReadByte()
 	result, _ := reader.ReadByte()
 
-	return &Feedback_OnOff_Packet{
+	return &Feedback_Level_Control_Packet{
 		GatewayID: id,
 		SerialNum: serialnum,
 		DeviceID:  deviceid,

@@ -19,15 +19,16 @@ var (
 	Illegal  uint16 = 0
 	HalfPack uint16 = 255
 
-	Login               uint16 = 1
-	HeartBeat           uint16 = 2
-	Add_Del_Device      uint16 = 5
-	Notification        uint16 = 6
-	Feedback_SetName    uint16 = 8
-	Feedback_Del_Device uint16 = 10
-	Feedback_Query_Attr uint16 = 11
-	Feedback_Depolyment uint16 = 15
-	Feedback_OnOff      uint16 = 19
+	Login                  uint16 = 1
+	HeartBeat              uint16 = 2
+	Add_Del_Device         uint16 = 5
+	Notification           uint16 = 6
+	Feedback_SetName       uint16 = 8
+	Feedback_Del_Device    uint16 = 10
+	Feedback_Query_Attr    uint16 = 11
+	Feedback_Depolyment    uint16 = 15
+	Feedback_OnOff         uint16 = 16
+	Feedback_Level_Control uint16 = 17
 )
 
 func ParseHeader(buffer []byte) *bytes.Reader {

@@ -31,6 +31,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*protocol.Feedback_Deployment_Packet).Serialize()
 	case protocol.Feedback_OnOff:
 		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
+	case protocol.Feedback_Level_Control:
+		return this.Packet.(*protocol.Feedback_Level_Control_Packet).Serialize()
 	}
 
 	return nil
@@ -69,6 +71,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		}
 
 		cmdid, pkglen := protocol.CheckProtocol(buffer)
+		log.Printf("<IN>    %d\n", cmdid)
 
 		pkgbyte := make([]byte, pkglen)
 		buffer.Read(pkgbyte)
@@ -109,6 +112,11 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			pkg := protocol.Parse_Feedback_Onoff(pkgbyte, smconn.ID)
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.Feedback_OnOff, pkg), nil
+
+		case protocol.Feedback_Level_Control:
+			pkg := protocol.Parse_Feedback_Level_Control(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Feedback_Level_Control, pkg), nil
 
 		case protocol.Illegal:
 			smconn.ReadMore = true

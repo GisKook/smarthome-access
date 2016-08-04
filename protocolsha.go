@@ -71,7 +71,6 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		}
 
 		cmdid, pkglen := protocol.CheckProtocol(buffer)
-		log.Printf("<IN>    %d\n", cmdid)
 
 		pkgbyte := make([]byte, pkglen)
 		buffer.Read(pkgbyte)

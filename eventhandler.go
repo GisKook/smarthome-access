@@ -41,7 +41,7 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	loginPkg := p.Packet.(*protocol.LoginPacket)
 	conn.Gateway = loginPkg.Gateway
 	conn.ID = conn.Gateway.ID
-	NewConns().SetID(conn.ID, conn.index)
+	NewConns().SetID(conn.ID, conn)
 	c.AsyncWritePacket(p, time.Second)
 }
 

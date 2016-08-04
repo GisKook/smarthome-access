@@ -6,7 +6,7 @@ import (
 
 type Conns struct {
 	connsindex map[uint32]*Conn
-	connsuid   map[uint64]uint32
+	connsuid   map[uint64]*Conn
 	index      uint32
 }
 
@@ -16,7 +16,7 @@ func NewConns() *Conns {
 	if connsInstance == nil {
 		connsInstance = &Conns{
 			connsindex: make(map[uint32]*Conn),
-			connsuid:   make(map[uint64]uint32),
+			connsuid:   make(map[uint64]*Conn),
 			index:      0,
 		}
 	}
@@ -29,21 +29,28 @@ func (cs *Conns) Add(conn *Conn) {
 	cs.connsindex[conn.index] = conn
 }
 
-func (cs *Conns) SetID(gatewayid uint64, index uint32) {
-	cs.connsuid[gatewayid] = index
+func (cs *Conns) SetID(gatewayid uint64, conn *Conn) {
+	cs.connsuid[gatewayid] = conn
 }
 
 func (cs *Conns) GetConn(uid uint64) *Conn {
-	return cs.connsindex[cs.connsuid[uid]]
+	return cs.connsuid[uid]
 }
 
 func (cs *Conns) Remove(c *Conn) {
 	delete(cs.connsindex, c.index)
-	delete(cs.connsuid, c.ID)
+	if c.index == cs.connsuid[c.ID].index {
+		delete(cs.connsuid, c.ID)
+	}
 }
 
 func (cs *Conns) Check(uid uint64) bool {
-	_, ok := cs.connsindex[cs.connsuid[uid]]
+	conn, ok := cs.connsuid[uid]
+	if ok {
+		_, realok := cs.connsindex[conn.index]
+
+		return realok
+	}
 	return ok
 }
 

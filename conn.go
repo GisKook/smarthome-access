@@ -86,6 +86,7 @@ func (c *Conn) SendToGateway(p gotcp.Packet) {
 
 func (c *Conn) UpdateReadflag() {
 	c.readflag = time.Now().Unix()
+	log.Printf("%x mac %x update read limit %d\n", &c, c.ID, c.readflag)
 }
 
 func (c *Conn) UpdateWriteflag() {
@@ -102,14 +103,15 @@ func (c *Conn) checkHeart() {
 		select {
 		case <-c.ticker.C:
 			now = time.Now().Unix()
+			log.Printf("%x mac %x check now %d read flag %d\n", &c, c.ID, now, c.readflag)
 			if now-c.readflag > int64(c.config.ReadLimit) {
-				log.Println("read linmit")
+				log.Printf("read limit %x\n", c.ID)
 				return
 			}
-			if now-c.writeflag > int64(c.config.WriteLimit) {
-				log.Println("write limit")
-				return
-			}
+			//			if now-c.writeflag > int64(c.config.WriteLimit) {
+			//				log.Println("write limit")
+			//				return
+			//			}
 			if c.Status == ConnUnauth {
 				log.Printf("unauth's gateway gatewayid %x\n", c.ID)
 				return

@@ -7,7 +7,7 @@
 	},
 	"ServerConfig":{
 		"BindPort":"8887",
-		"ReadLimit":300,
+		"ReadLimit":100,
 		"WriteLimit":30000,
 		"ConnTimeout":300,
 		"ConnCheckInterval":300,

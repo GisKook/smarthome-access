@@ -75,6 +75,15 @@ func on_feedback_set_name(c *gotcp.Conn, p *ShaPacket) {
 	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 
+func on_feedback_del_device(c *gotcp.Conn, p *ShaPacket) {
+	conn := c.GetExtraData().(*Conn)
+	feedback_del_device_pkg := p.Packet.(*protocol.Feedback_Del_Device_Packet)
+	if feedback_del_device_pkg.Result == 0 {
+		base.Gateway_Del_Device(conn.Gateway, feedback_del_device_pkg.DeviceID)
+	}
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+}
+
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
 	switch shaPacket.Type {
@@ -91,7 +100,7 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	case protocol.Feedback_SetName:
 		on_feedback_set_name(c, shaPacket)
 	case protocol.Feedback_Del_Device:
-		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+		on_feedback_del_device(c, shaPacket)
 	case protocol.Feedback_Query_Attr:
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_Depolyment:

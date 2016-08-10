@@ -26,6 +26,11 @@ func Gateway_Add_Device(gateway *Gateway, device *Device) {
 	gateway.Devices = append(gateway.Devices, *device)
 }
 
+func Gateway_Update_Davice(gateway *Gateway, device *Device) {
+	Gateway_Del_Device(gateway, device.ID)
+	Gateway_Add_Device(gateway, device)
+}
+
 func Gateway_Del_Device(gateway *Gateway, deviceid uint64) {
 	devicecount := len(gateway.Devices)
 	var i int = 0

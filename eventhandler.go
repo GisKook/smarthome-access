@@ -54,8 +54,10 @@ func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
 	if add_del_device_pkg.Action == protocol.ADD_DEVICE {
 		if !base.Gateway_Check_Device(conn.Gateway, add_del_device_pkg.Device.ID) {
 			base.Gateway_Add_Device(conn.Gateway, add_del_device_pkg.Device)
-			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+		} else {
+			base.Gateway_Update_Davice(conn.Gateway, add_del_device_pkg.Device)
 		}
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	} else if add_del_device_pkg.Action == protocol.DEL_DEVICE {
 		if base.Gateway_Check_Device(conn.Gateway, add_del_device_pkg.Device.ID) {
 			base.Gateway_Del_Device(conn.Gateway, conn.ID)

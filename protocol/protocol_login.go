@@ -68,8 +68,10 @@ func ParseLogin(buffer []byte) *LoginPacket {
 		for j := 0; byte(j) < endpoint_count; j++ {
 			endpoints[j].Endpoint, _ = reader.ReadByte()
 			endpoints[j].DeviceTypeID = base.ReadWord(reader)
-			if endpoints[j].DeviceTypeID == 0x0402 {
+			if endpoints[j].DeviceTypeID == base.SS_Device_DeviceTypeID {
 				endpoints[j].Zonetype = base.ReadWord(reader)
+			} else if endpoints[j].DeviceTypeID == base.MPO_Device_DeviceTypeID || endpoints[j].DeviceTypeID == base.Shade_Device_DeviceTypeID {
+				endpoints[j].Status, _ = reader.ReadByte()
 			}
 		}
 		devicelist[i].Endpoints = endpoints

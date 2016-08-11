@@ -1,11 +1,14 @@
 package base
 
 const SS_Device_DeviceTypeID uint16 = 0x0402
+const MPO_Device_DeviceTypeID uint16 = 0x0009 // Mains Power Outlet
+const Shade_Device_DeviceTypeID uint16 = 0x0200
 
 type Endpoint struct {
 	Endpoint     uint8
 	DeviceTypeID uint16
 	Zonetype     uint16
+	Status       uint8
 }
 
 type Device struct {

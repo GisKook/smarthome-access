@@ -69,6 +69,11 @@ func (p *Nsq_Device_List_Packet) Serialize() []byte {
 						Npara: uint64(p.Gateway.Devices[i].Endpoints[j].Zonetype),
 					})
 					//log.Printf("device %d endpoint %d zonetype %d\n", i, p.Gateway.Devices[i].Endpoints[j].Endpoint, p.Gateway.Devices[i].Endpoints[j].Zonetype)
+				} else if devicetypeid == base.MPO_Device_DeviceTypeID || devicetypeid == base.Shade_Device_DeviceTypeID {
+					para = append(para, &Report.Command_Param{
+						Type:  Report.Command_Param_UINT8,
+						Npara: uint64(p.Gateway.Devices[i].Endpoints[j].Status),
+					})
 				}
 			}
 		}

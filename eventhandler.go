@@ -84,6 +84,24 @@ func on_feedback_del_device(c *gotcp.Conn, p *ShaPacket) {
 	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 
+func on_feedback_onoff(c *gotcp.Conn, p *ShaPacket) {
+	conn := c.GetExtraData().(*Conn)
+	feedback_onoff_pkg := p.Packet.(*protocol.Feedback_OnOff_Packet)
+	if feedback_onoff_pkg.Result == 0 {
+		base.Gateway_Set_Device_Status(conn.Gateway, feedback_onoff_pkg.DeviceID, feedback_onoff_pkg.Endpoint, feedback_onoff_pkg.Action)
+	}
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+}
+
+func on_feedback_level_control(c *gotcp.Conn, p *ShaPacket) {
+	conn := c.GetExtraData().(*Conn)
+	feedback_level_control_pkg := p.Packet.(*protocol.Feedback_Level_Control_Packet)
+	if feedback_level_control_pkg.Result == 0 {
+		base.Gateway_Set_Device_Status(conn.Gateway, feedback_level_control_pkg.DeviceID, feedback_level_control_pkg.Endpoint, feedback_level_control_pkg.Action)
+	}
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+}
+
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	shaPacket := p.(*ShaPacket)
 	switch shaPacket.Type {
@@ -106,10 +124,9 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 	case protocol.Feedback_Depolyment:
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Feedback_OnOff:
-		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+		on_feedback_onoff(c, shaPacket)
 	case protocol.Feedback_Level_Control:
-		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
-
+		on_feedback_level_control(c, shaPacket)
 	}
 
 	return true

@@ -25,6 +25,30 @@ type Gateway struct {
 	Devices         []Device
 }
 
+func _gateway_get_device(gateway *Gateway, deviceid uint64) *Device {
+	devicecount := len(gateway.Devices)
+	var i int = 0
+	for i = 0; i < devicecount; i++ {
+		if gateway.Devices[i].ID == deviceid {
+			return &gateway.Devices[i]
+		}
+	}
+
+	return nil
+}
+
+func _device_get_endpoint(device *Device, endpoint uint8) *Endpoint {
+	epcount := len(device.Endpoints)
+	var i int = 0
+	for i = 0; i < epcount; i++ {
+		if device.Endpoints[i].Endpoint == endpoint {
+			return &device.Endpoints[i]
+		}
+	}
+
+	return nil
+}
+
 func Gateway_Add_Device(gateway *Gateway, device *Device) {
 	gateway.Devices = append(gateway.Devices, *device)
 }
@@ -64,4 +88,14 @@ func Gateway_Check_Device(gateway *Gateway, deviceid uint64) bool {
 	}
 
 	return false
+}
+
+func Gateway_Set_Device_Status(gateway *Gateway, deviceid uint64, endpoint uint8, status uint8) {
+	device := _gateway_get_device(gateway, deviceid)
+	if device != nil {
+		ep := _device_get_endpoint(device, endpoint)
+		if ep != nil {
+			ep.Status = status
+		}
+	}
 }

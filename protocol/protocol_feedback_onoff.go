@@ -16,7 +16,6 @@ type Feedback_OnOff_Packet struct {
 	Endpoint  uint8
 	Action    uint8
 	Result    uint8
-	Status    uint8
 }
 
 func (p *Feedback_OnOff_Packet) Serialize() []byte {
@@ -27,7 +26,7 @@ func (p *Feedback_OnOff_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Status),
+			Npara: uint64(p.Action),
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,

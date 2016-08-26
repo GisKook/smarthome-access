@@ -35,6 +35,7 @@ type Conn struct {
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
+	log.Println("new connection")
 	return &Conn{
 		conn:                 conn,
 		recieveBuffer:        bytes.NewBuffer([]byte{}),

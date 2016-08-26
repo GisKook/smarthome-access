@@ -4,6 +4,7 @@ import (
 	"github.com/giskook/gotcp"
 	"github.com/giskook/smarthome-access/protocol"
 	"log"
+	"sync"
 )
 
 type ShaPacket struct {
@@ -50,7 +51,8 @@ type ShaProtocol struct {
 
 func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 	smconn := c.GetExtraData().(*Conn)
-	smconn.UpdateReadflag()
+	var once sync.Once
+	once.Do(smconn.UpdateReadflag)
 
 	buffer := smconn.GetBuffer()
 

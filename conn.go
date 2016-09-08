@@ -35,7 +35,6 @@ type Conn struct {
 }
 
 func NewConn(conn *gotcp.Conn, config *ConnConfig) *Conn {
-	log.Println("new connection")
 	return &Conn{
 		conn:                 conn,
 		recieveBuffer:        bytes.NewBuffer([]byte{}),
@@ -87,7 +86,6 @@ func (c *Conn) SendToGateway(p gotcp.Packet) {
 
 func (c *Conn) UpdateReadflag() {
 	c.readflag = time.Now().Unix()
-	log.Printf("%x mac %x update read limit %d\n", &c, c.ID, c.readflag)
 }
 
 func (c *Conn) UpdateWriteflag() {
@@ -104,7 +102,6 @@ func (c *Conn) checkHeart() {
 		select {
 		case <-c.ticker.C:
 			now = time.Now().Unix()
-			log.Printf("%x mac %x check now %d read flag %d\n", &c, c.ID, now, c.readflag)
 			if now-c.readflag > int64(c.config.ReadLimit) {
 				log.Printf("read limit %x\n", c.ID)
 				return

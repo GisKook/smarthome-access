@@ -21,7 +21,6 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 		WriteLimit:        uint16(writelimit),
 	}
 	conn := NewConn(c, config)
-	log.Printf("on connect %x\n", &conn)
 
 	c.PutExtraData(conn)
 

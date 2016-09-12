@@ -61,8 +61,8 @@ func ParseLogin(buffer []byte) *LoginPacket {
 	for i := 0; uint16(i) < devicecount; i++ {
 		devicelist[i].ID = base.ReadQuaWord(reader)
 		device_name_len, _ := reader.ReadByte()
-		device_name_byte := make([]byte, device_name_len)
-		reader.Read(device_name_byte)
+		device_name := base.ReadString(reader, device_name_len)
+		devicelist[i].Name = device_name
 		endpoint_count, _ := reader.ReadByte()
 		endpoints := make([]base.Endpoint, endpoint_count)
 		for j := 0; byte(j) < endpoint_count; j++ {

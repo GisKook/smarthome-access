@@ -7,10 +7,16 @@ import (
 )
 
 type Feedback_Deployment_Packet struct {
-	GatewayID uint64
-	DeviceID  uint64
-	SerialNum uint32
-	Result    uint8
+	GatewayID     uint64
+	SerialNum     uint32
+	DeviceID      uint64
+	EndPoint      uint8
+	ArmModel      uint8
+	StartTimeHour uint8
+	StartTimeMin  uint8
+	EndTimeHour   uint8
+	EndTimeMin    uint8
+	Result        uint8
 }
 
 func (p *Feedback_Deployment_Packet) Serialize() []byte {
@@ -18,6 +24,26 @@ func (p *Feedback_Deployment_Packet) Serialize() []byte {
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(GATEWAY_ON_LINE),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.ArmModel),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.StartTimeHour),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.StartTimeMin),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.EndTimeHour),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.EndTimeMin),
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
@@ -45,12 +71,24 @@ func Parse_Feedback_Deployment(buffer []byte, id uint64) *Feedback_Deployment_Pa
 	reader := ParseHeader(buffer)
 	serialnum := base.ReadDWord(reader)
 	deviceid := base.ReadQuaWord(reader)
+	endpoint, _ := reader.ReadByte()
+	armmodel, _ := reader.ReadByte()
+	start_time_hour, _ := reader.ReadByte()
+	start_time_min, _ := reader.ReadByte()
+	end_time_hour, _ := reader.ReadByte()
+	end_time_min, _ := reader.ReadByte()
 	result, _ := reader.ReadByte()
 
 	return &Feedback_Deployment_Packet{
-		GatewayID: id,
-		DeviceID:  deviceid,
-		SerialNum: serialnum,
-		Result:    result,
+		GatewayID:     id,
+		SerialNum:     serialnum,
+		DeviceID:      deviceid,
+		EndPoint:      endpoint,
+		ArmModel:      armmodel,
+		StartTimeHour: start_time_hour,
+		StartTimeMin:  start_time_min,
+		EndTimeHour:   end_time_hour,
+		EndTimeMin:    end_time_min,
+		Result:        result,
 	}
 }

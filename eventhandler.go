@@ -127,6 +127,10 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		on_feedback_onoff(c, shaPacket)
 	case protocol.Feedback_Level_Control:
 		on_feedback_level_control(c, shaPacket)
+	case protocol.Notify_OnOff:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Notify_Level:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	}
 
 	return true

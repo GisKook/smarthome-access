@@ -29,6 +29,8 @@ var (
 	Feedback_Depolyment    uint16 = 15
 	Feedback_OnOff         uint16 = 16
 	Feedback_Level_Control uint16 = 17
+	Notify_OnOff           uint16 = 0x0016
+	Notify_Level           uint16 = 0x0018
 )
 
 func ParseHeader(buffer []byte) *bytes.Reader {

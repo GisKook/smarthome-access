@@ -70,5 +70,13 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			pkg := protocol.Parse_Device_List(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, nil)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
+	case Report.Command_CMT_REQ_READ_DEPLOYMENT_STATUS:
+		if c != nil {
+			pkg := protocol.Parse_NSQ_Read_Deployment_Status(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, command.Paras)
+			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
+		} else {
+			pkg := protocol.Parse_NSQ_Read_Deployment_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, nil)
+			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
+		}
 	}
 }

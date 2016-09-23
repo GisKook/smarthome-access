@@ -41,19 +41,20 @@ const (
 	Command_CMT_REP_ONOFF_STATUS   Command_CommandType = 22
 	Command_CMT_REP_DEVICELIST     Command_CommandType = 2049
 	// web->gateway
-	Command_CMT_REP_LOGIN               Command_CommandType = 32769
-	Command_CMT_REQ_ONLINE              Command_CommandType = 32770
-	Command_CMT_REQ_SETNAME             Command_CommandType = 32776
-	Command_CMT_REQ_DEL_DEVICE          Command_CommandType = 32778
-	Command_CMT_REQ_DEVICE_ATTR         Command_CommandType = 32779
-	Command_CMT_REQ_DEVICE_IDENTIFY     Command_CommandType = 32780
-	Command_CMT_REQ_DEVICE_WARN         Command_CommandType = 32781
-	Command_CMT_REQ_DEPLOYMENT          Command_CommandType = 32783
-	Command_CMT_REQ_DEVICE_LEVELCONTROL Command_CommandType = 32785
-	Command_CMT_REQ_ONOFF               Command_CommandType = 32787
-	Command_CMT_REQ_DEVICE_ONLINE       Command_CommandType = 32789
-	Command_CMT_REQ_ONOFF_STATUS        Command_CommandType = 32790
-	Command_CMT_REQ_DEVICELIST          Command_CommandType = 34817
+	Command_CMT_REP_LOGIN                  Command_CommandType = 32769
+	Command_CMT_REQ_ONLINE                 Command_CommandType = 32770
+	Command_CMT_REQ_SETNAME                Command_CommandType = 32776
+	Command_CMT_REQ_DEL_DEVICE             Command_CommandType = 32778
+	Command_CMT_REQ_DEVICE_ATTR            Command_CommandType = 32779
+	Command_CMT_REQ_DEVICE_IDENTIFY        Command_CommandType = 32780
+	Command_CMT_REQ_DEVICE_WARN            Command_CommandType = 32781
+	Command_CMT_REQ_DEPLOYMENT             Command_CommandType = 32783
+	Command_CMT_REQ_DEVICE_LEVELCONTROL    Command_CommandType = 32785
+	Command_CMT_REQ_ONOFF                  Command_CommandType = 32787
+	Command_CMT_REQ_DEVICE_ONLINE          Command_CommandType = 32789
+	Command_CMT_REQ_ONOFF_STATUS           Command_CommandType = 32790
+	Command_CMT_REQ_DEVICELIST             Command_CommandType = 34817
+	Command_CMT_REQ_READ_DEPLOYMENT_STATUS Command_CommandType = 32799
 )
 
 var Command_CommandType_name = map[int32]string{
@@ -83,34 +84,36 @@ var Command_CommandType_name = map[int32]string{
 	32789: "CMT_REQ_DEVICE_ONLINE",
 	32790: "CMT_REQ_ONOFF_STATUS",
 	34817: "CMT_REQ_DEVICELIST",
+	32799: "CMT_REQ_READ_DEPLOYMENT_STATUS",
 }
 var Command_CommandType_value = map[string]int32{
-	"CMT_INVALID":                 0,
-	"CMT_REQ_LOGIN":               1,
-	"CMT_REP_ONLINE":              2,
-	"CMT_REP_ADD_DEL_DEVICE":      5,
-	"CMT_REP_NOTIFICATION":        6,
-	"CMT_REP_SETNAME":             8,
-	"CMT_REP_DEL_DEVICE":          10,
-	"CMT_REP_DEVICE_ATTR":         11,
-	"CMT_REP_DEPLOYMENT":          15,
-	"CMT_REP_ONOFF":               19,
-	"CMT_REP_DEVICE_ONLINE":       21,
-	"CMT_REP_ONOFF_STATUS":        22,
-	"CMT_REP_DEVICELIST":          2049,
-	"CMT_REP_LOGIN":               32769,
-	"CMT_REQ_ONLINE":              32770,
-	"CMT_REQ_SETNAME":             32776,
-	"CMT_REQ_DEL_DEVICE":          32778,
-	"CMT_REQ_DEVICE_ATTR":         32779,
-	"CMT_REQ_DEVICE_IDENTIFY":     32780,
-	"CMT_REQ_DEVICE_WARN":         32781,
-	"CMT_REQ_DEPLOYMENT":          32783,
-	"CMT_REQ_DEVICE_LEVELCONTROL": 32785,
-	"CMT_REQ_ONOFF":               32787,
-	"CMT_REQ_DEVICE_ONLINE":       32789,
-	"CMT_REQ_ONOFF_STATUS":        32790,
-	"CMT_REQ_DEVICELIST":          34817,
+	"CMT_INVALID":                    0,
+	"CMT_REQ_LOGIN":                  1,
+	"CMT_REP_ONLINE":                 2,
+	"CMT_REP_ADD_DEL_DEVICE":         5,
+	"CMT_REP_NOTIFICATION":           6,
+	"CMT_REP_SETNAME":                8,
+	"CMT_REP_DEL_DEVICE":             10,
+	"CMT_REP_DEVICE_ATTR":            11,
+	"CMT_REP_DEPLOYMENT":             15,
+	"CMT_REP_ONOFF":                  19,
+	"CMT_REP_DEVICE_ONLINE":          21,
+	"CMT_REP_ONOFF_STATUS":           22,
+	"CMT_REP_DEVICELIST":             2049,
+	"CMT_REP_LOGIN":                  32769,
+	"CMT_REQ_ONLINE":                 32770,
+	"CMT_REQ_SETNAME":                32776,
+	"CMT_REQ_DEL_DEVICE":             32778,
+	"CMT_REQ_DEVICE_ATTR":            32779,
+	"CMT_REQ_DEVICE_IDENTIFY":        32780,
+	"CMT_REQ_DEVICE_WARN":            32781,
+	"CMT_REQ_DEPLOYMENT":             32783,
+	"CMT_REQ_DEVICE_LEVELCONTROL":    32785,
+	"CMT_REQ_ONOFF":                  32787,
+	"CMT_REQ_DEVICE_ONLINE":          32789,
+	"CMT_REQ_ONOFF_STATUS":           32790,
+	"CMT_REQ_DEVICELIST":             34817,
+	"CMT_REQ_READ_DEPLOYMENT_STATUS": 32799,
 }
 
 func (x Command_CommandType) String() string {

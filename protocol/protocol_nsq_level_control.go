@@ -8,6 +8,7 @@ import (
 
 const CMD_LEVEL_CONTROL uint16 = 0x8011
 const CMD_LEVEL_CONTROL_LEN uint16 = 0x0018
+const CMD_LEVEL_PAUSE uint8 = 3
 
 type Nsq_Level_Control_Packet struct {
 	SerialNum       uint32
@@ -27,8 +28,10 @@ func (p *Nsq_Level_Control_Packet) Serialize() []byte {
 	base.WriteQuaWord(&writer, p.DeviceID)
 	writer.WriteByte(byte(p.Endpoint))
 	writer.WriteByte(byte(p.CommandID))
-	writer.WriteByte(byte(p.Level))
-	base.WriteWord(&writer, p.TransactionTime)
+	if p.CommandID != CMD_LEVEL_PAUSE {
+		writer.WriteByte(byte(p.Level))
+		base.WriteWord(&writer, p.TransactionTime)
+	}
 	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))
 	writer.WriteByte(ENDFLAG)
 
@@ -38,14 +41,15 @@ func (p *Nsq_Level_Control_Packet) Serialize() []byte {
 func Parse_NSQ_Level_Control(serialnum uint32, paras []*Report.Command_Param) *Nsq_Level_Control_Packet {
 	deviceid := paras[0].Npara
 	endpint := uint8(paras[1].Npara)
-	level := uint8(paras[2].Npara)
+	action := uint8(paras[2].Npara)
+	level := uint8(paras[3].Npara)
 
 	return &Nsq_Level_Control_Packet{
 		SerialNum:       serialnum,
 		DeviceID:        deviceid,
 		Endpoint:        endpint,
 		Level:           level,
-		CommandID:       0,
+		CommandID:       action,
 		TransactionTime: 0xffff,
 	}
 }

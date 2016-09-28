@@ -35,7 +35,7 @@ func (p *Notify_OnOff_Packet) Serialize() []byte {
 	}
 
 	command := &Report.Command{
-		Type:  Report.Command_CMT_REP_ONOFF,
+		Type:  Report.Command_CMT_REP_NOTIFY_ONOFF,
 		Paras: para,
 	}
 

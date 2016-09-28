@@ -16,7 +16,7 @@ message Command {
 		CMT_REP_DEPLOYMENT       = 0x000f;
 		CMT_REP_ONOFF            = 0x0013;  // only for onoff device
 		CMT_REP_DEVICE_ONLINE    = 0x0015;  // unsupport right now
-		CMT_REP_ONOFF_STATUS     = 0x0016;  // unsupport right now only for onoff deivce
+		CMT_REP_NOTIFY_ONOFF     = 0x0016;  // unsupport right now only for onoff deivce
 		CMT_REP_DEVICELIST       = 0x0801; 
 		CMT_REP_NOTIFY_LEVEL     = 0x0018;
 		

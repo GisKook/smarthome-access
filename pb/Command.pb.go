@@ -38,7 +38,7 @@ const (
 	Command_CMT_REP_DEPLOYMENT     Command_CommandType = 15
 	Command_CMT_REP_ONOFF          Command_CommandType = 19
 	Command_CMT_REP_DEVICE_ONLINE  Command_CommandType = 21
-	Command_CMT_REP_ONOFF_STATUS   Command_CommandType = 22
+	Command_CMT_REP_NOTIFY_ONOFF   Command_CommandType = 22
 	Command_CMT_REP_DEVICELIST     Command_CommandType = 2049
 	Command_CMT_REP_NOTIFY_LEVEL   Command_CommandType = 24
 	// web->gateway
@@ -70,7 +70,7 @@ var Command_CommandType_name = map[int32]string{
 	15:    "CMT_REP_DEPLOYMENT",
 	19:    "CMT_REP_ONOFF",
 	21:    "CMT_REP_DEVICE_ONLINE",
-	22:    "CMT_REP_ONOFF_STATUS",
+	22:    "CMT_REP_NOTIFY_ONOFF",
 	2049:  "CMT_REP_DEVICELIST",
 	24:    "CMT_REP_NOTIFY_LEVEL",
 	32769: "CMT_REP_LOGIN",
@@ -100,7 +100,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_DEPLOYMENT":             15,
 	"CMT_REP_ONOFF":                  19,
 	"CMT_REP_DEVICE_ONLINE":          21,
-	"CMT_REP_ONOFF_STATUS":           22,
+	"CMT_REP_NOTIFY_ONOFF":           22,
 	"CMT_REP_DEVICELIST":             2049,
 	"CMT_REP_NOTIFY_LEVEL":           24,
 	"CMT_REP_LOGIN":                  32769,

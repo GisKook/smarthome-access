@@ -25,6 +25,7 @@ func (p *Nsq_Read_Deployment_Status_Packet) SerializeOnline() []byte {
 	base.WriteWord(&writer, CMD_READ_DEPLOYMENT_STATUS)
 	base.WriteDWord(&writer, p.SerialNum)
 	base.WriteQuaWord(&writer, p.DeviceID)
+	writer.WriteByte(p.Endpoint)
 	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))
 	writer.WriteByte(ENDFLAG)
 

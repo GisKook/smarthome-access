@@ -25,6 +25,7 @@ func (p *Nsq_Read_OnOff_Status_Packet) SerializeOnline() []byte {
 	base.WriteWord(&writer, CMD_READ_ONOFF_STATUS)
 	base.WriteDWord(&writer, p.SerialNum)
 	base.WriteQuaWord(&writer, p.DeviceID)
+	writer.WriteByte(p.Endpoint)
 	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))
 	writer.WriteByte(ENDFLAG)
 
@@ -40,7 +41,7 @@ func (p *Nsq_Read_OnOff_Status_Packet) SerializeOffline() []byte {
 	}
 
 	command := &Report.Command{
-		Type:  Report.Command_CMT_REP_NOTIFY_ONOFF,
+		Type:  Report.Command_CMT_REQ_ONOFF_STATUS,
 		Paras: para,
 	}
 

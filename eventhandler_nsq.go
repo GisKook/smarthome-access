@@ -75,7 +75,7 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			pkg := protocol.Parse_NSQ_Read_Deployment_Status(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, command.Paras)
 			c.SendToGateway(pkg)
 		} else {
-			pkg := protocol.Parse_NSQ_Read_Deployment_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, nil)
+			pkg := protocol.Parse_NSQ_Read_Deployment_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, command.Paras)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
 	case Report.Command_CMT_REQ_ONOFF_STATUS:
@@ -83,7 +83,7 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			pkg := protocol.Parse_NSQ_Read_OnOff_Status(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, command.Paras)
 			c.SendToGateway(pkg)
 		} else {
-			pkg := protocol.Parse_NSQ_Read_OnOff_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, nil)
+			pkg := protocol.Parse_NSQ_Read_OnOff_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, command.Paras)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
 

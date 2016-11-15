@@ -41,8 +41,10 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 		pkg := protocol.Parse_NSQ_Identify(serialnum, command.Paras)
 		c.SendToGateway(pkg)
 	case Report.Command_CMT_REQ_DEVICE_WARN:
-		pkg := protocol.Parse_NSQ_Warn(serialnum, command.Paras)
-		c.SendToGateway(pkg)
+		if c != nil {
+			pkg := protocol.Parse_NSQ_Warn(serialnum, command.Paras)
+			c.SendToGateway(pkg)
+		}
 	case Report.Command_CMT_REQ_DEPLOYMENT:
 		if c != nil {
 			pkg := protocol.Parse_NSQ_Deployment(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, command.Paras)
@@ -52,8 +54,10 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
 	case Report.Command_CMT_REQ_DEVICE_LEVELCONTROL:
-		pkg := protocol.Parse_NSQ_Level_Control(serialnum, command.Paras)
-		c.SendToGateway(pkg)
+		if c != nil {
+			pkg := protocol.Parse_NSQ_Level_Control(serialnum, command.Paras)
+			c.SendToGateway(pkg)
+		}
 	case Report.Command_CMT_REQ_ONOFF:
 		if c != nil {
 			pkg := protocol.Parse_NSQ_OnOff(gatewayid, serialnum, protocol.GATEWAY_ON_LINE, command.Paras)

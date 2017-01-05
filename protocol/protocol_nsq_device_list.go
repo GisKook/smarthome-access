@@ -44,6 +44,11 @@ func (p *Nsq_Device_List_Packet) Serialize() []byte {
 				Type:    Report.Command_Param_STRING,
 				Strpara: p.Gateway.Devices[i].Name,
 			})
+
+			para = append(para, &Report.Command_Param{
+				Type:  Report.Command_Param_UINT8,
+				Npara: uint64(p.Gateway.Devices[i].Status),
+			})
 			//log.Printf("device %d name %s\n", i, p.Gateway.Devices[i].Name)
 			endpoint_count := len(p.Gateway.Devices[i].Endpoints)
 			para = append(para, &Report.Command_Param{

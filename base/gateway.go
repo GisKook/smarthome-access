@@ -5,6 +5,9 @@ const MPO_Device_DeviceTypeID uint16 = 0x0009 // Mains Power Outlet
 const Shade_Device_DeviceTypeID uint16 = 0x0200
 const HA_Device_ON_OFF_Output_DeviceTypeID uint16 = 0x0002
 
+const ONLINE uint8 = 1
+const OFFLINE uint8 = 0
+
 type Endpoint struct {
 	Endpoint     uint8
 	DeviceTypeID uint16
@@ -15,6 +18,7 @@ type Endpoint struct {
 type Device struct {
 	ID        uint64
 	Name      string
+	Status    uint8
 	Endpoints []Endpoint
 }
 
@@ -98,5 +102,12 @@ func Gateway_Set_Device_Status(gateway *Gateway, deviceid uint64, endpoint uint8
 		if ep != nil {
 			ep.Status = status
 		}
+	}
+}
+
+func Gateway_Set_Device_Online(gateway *Gateway, deviceid uint64, status uint8) {
+	device := _gateway_get_device(gateway, deviceid)
+	if device != nil {
+		device.Status = status
 	}
 }

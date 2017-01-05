@@ -82,6 +82,7 @@ func Parse_Add_Del_Device(buffer []byte, id uint64) *Add_Del_Device_Packet {
 	device_type_count, _ := reader.ReadByte()
 	var device base.Device
 	device.ID = deviceid
+	device.Status = 1
 	device.Name = name
 	for i := 0; byte(i) < device_type_count; i++ {
 		endpoint, _ := reader.ReadByte()

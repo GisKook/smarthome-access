@@ -34,6 +34,8 @@ func (this *ShaPacket) Serialize() []byte {
 		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
 	case protocol.Feedback_Level_Control:
 		return this.Packet.(*protocol.Feedback_Level_Control_Packet).Serialize()
+	case protocol.Notify_OnOff:
+		return this.Packet.(*protocol.Notify_OnOff_Packet).Serialize()
 	}
 
 	return nil

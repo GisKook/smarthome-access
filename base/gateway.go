@@ -1,5 +1,9 @@
 package base
 
+import (
+	"log"
+)
+
 const SS_Device_DeviceTypeID uint16 = 0x0402
 const MPO_Device_DeviceTypeID uint16 = 0x0009 // Mains Power Outlet
 const Shade_Device_DeviceTypeID uint16 = 0x0200
@@ -100,6 +104,8 @@ func Gateway_Set_Device_Status(gateway *Gateway, deviceid uint64, endpoint uint8
 	if device != nil {
 		ep := _device_get_endpoint(device, endpoint)
 		if ep != nil {
+			log.Println("_-----")
+			log.Println(status)
 			ep.Status = status
 		}
 	}

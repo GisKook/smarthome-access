@@ -103,10 +103,11 @@ func on_feedback_level_control(c *gotcp.Conn, p *ShaPacket) {
 }
 
 func on_notify_onoff(c *gotcp.Conn, p *ShaPacket) {
+	log.Println("on notify onoff")
 	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
-	//	conn := c.GetExtraData().(*Conn)
-	//	notify_onoff_pkg := p.Packet.(*protocol.Notify_OnOff_Packet)
-	//	base.Gateway_Set_Device_Online(conn.Gateway, notify_onoff_pkg.DeviceID, notify_onoff_pkg.Status)
+	conn := c.GetExtraData().(*Conn)
+	notify_onoff_pkg := p.Packet.(*protocol.Notify_OnOff_Packet)
+	base.Gateway_Set_Device_Status(conn.Gateway, notify_onoff_pkg.DeviceID, notify_onoff_pkg.EndPoint, notify_onoff_pkg.Status)
 }
 
 func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {

@@ -120,6 +120,10 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			pkg := protocol.Parse_Feedback_Level_Control(pkgbyte, smconn.ID)
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.Feedback_Level_Control, pkg), nil
+		case protocol.Notify_OnOff:
+			pkg := protocol.Parse_Notify_OnOff(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Notify_OnOff, pkg), nil
 
 		case protocol.Illegal:
 			smconn.ReadMore = true

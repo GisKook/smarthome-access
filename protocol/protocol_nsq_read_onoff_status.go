@@ -5,6 +5,7 @@ import (
 	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
+	"log"
 )
 
 const CMD_READ_ONOFF_STATUS uint16 = 0x8016
@@ -67,6 +68,9 @@ func (p *Nsq_Read_OnOff_Status_Packet) Serialize() []byte {
 func Parse_NSQ_Read_OnOff_Status(gatewayid uint64, serialnum uint32, status byte, paras []*Report.Command_Param) *Nsq_Read_OnOff_Status_Packet {
 	deviceid := paras[0].Npara
 	endpint := uint8(paras[1].Npara)
+	log.Println("----")
+	log.Println(endpint)
+	log.Println("----")
 
 	return &Nsq_Read_OnOff_Status_Packet{
 		GatewayID: gatewayid,

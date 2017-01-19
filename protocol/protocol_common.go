@@ -31,6 +31,7 @@ var (
 	Feedback_Level_Control uint16 = 17
 	Notify_OnOff           uint16 = 0x0016
 	Notify_Level           uint16 = 0x0018
+	Notify_Online_Status   uint16 = 0x0020
 )
 
 func ParseHeader(buffer []byte) *bytes.Reader {

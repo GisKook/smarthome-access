@@ -22,7 +22,7 @@ type Nsq_Level_Control_Packet struct {
 func (p *Nsq_Level_Control_Packet) Serialize() []byte {
 	var writer bytes.Buffer
 	writer.WriteByte(STARTFLAG)
-	base.WriteWord(&writer, CMD_LEVEL_CONTROL_LEN)
+	base.WriteWord(&writer, 0)
 	base.WriteWord(&writer, CMD_LEVEL_CONTROL)
 	base.WriteDWord(&writer, p.SerialNum)
 	base.WriteQuaWord(&writer, p.DeviceID)
@@ -31,7 +31,10 @@ func (p *Nsq_Level_Control_Packet) Serialize() []byte {
 	if p.CommandID != CMD_LEVEL_PAUSE {
 		writer.WriteByte(byte(p.Level))
 		base.WriteWord(&writer, p.TransactionTime)
+	} else {
+		writer.WriteByte(0x03)
 	}
+	base.WriteLength(&writer)
 	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))
 	writer.WriteByte(ENDFLAG)
 

@@ -11,8 +11,7 @@ type Feedback_Level_Control_Packet struct {
 	SerialNum uint32
 	DeviceID  uint64
 	Endpoint  uint8
-	Action    uint8
-	Result    uint8
+	Level     uint8
 }
 
 func (p *Feedback_Level_Control_Packet) Serialize() []byte {
@@ -23,11 +22,7 @@ func (p *Feedback_Level_Control_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Action),
-		},
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Result),
+			Npara: uint64(p.Level),
 		},
 	}
 
@@ -52,15 +47,13 @@ func Parse_Feedback_Level_Control(buffer []byte, id uint64) *Feedback_Level_Cont
 	serialnum := base.ReadDWord(reader)
 	deviceid := base.ReadQuaWord(reader)
 	endpoint, _ := reader.ReadByte()
-	action, _ := reader.ReadByte()
-	result, _ := reader.ReadByte()
+	level, _ := reader.ReadByte()
 
 	return &Feedback_Level_Control_Packet{
 		GatewayID: id,
 		SerialNum: serialnum,
 		DeviceID:  deviceid,
 		Endpoint:  endpoint,
-		Action:    action,
-		Result:    result,
+		Level:     level,
 	}
 }

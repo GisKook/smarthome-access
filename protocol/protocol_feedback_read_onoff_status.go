@@ -14,8 +14,7 @@ type Feedback_Read_OnOff_Status_Packet struct {
 	SerialNum uint32
 	DeviceID  uint64
 	Endpoint  uint8
-	Action    uint8
-	Result    uint8
+	Status    uint8
 }
 
 func (p *Feedback_Read_OnOff_Status_Packet) Serialize() []byte {
@@ -26,11 +25,7 @@ func (p *Feedback_Read_OnOff_Status_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Action),
-		},
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Result),
+			Npara: uint64(p.Status),
 		},
 	}
 
@@ -55,15 +50,13 @@ func Parse_Feedback_Read_OnOff_Status(buffer []byte, id uint64) *Feedback_Read_O
 	serialnum := base.ReadDWord(reader)
 	deviceid := base.ReadQuaWord(reader)
 	endpoint, _ := reader.ReadByte()
-	action, _ := reader.ReadByte()
-	result, _ := reader.ReadByte()
+	status, _ := reader.ReadByte()
 
 	return &Feedback_Read_OnOff_Status_Packet{
 		GatewayID: id,
 		SerialNum: serialnum,
 		DeviceID:  deviceid,
 		Endpoint:  endpoint,
-		Action:    action,
-		Result:    result,
+		Status:    status,
 	}
 }

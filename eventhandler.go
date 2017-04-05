@@ -96,9 +96,9 @@ func on_feedback_onoff(c *gotcp.Conn, p *ShaPacket) {
 func on_feedback_level_control(c *gotcp.Conn, p *ShaPacket) {
 	conn := c.GetExtraData().(*Conn)
 	feedback_level_control_pkg := p.Packet.(*protocol.Feedback_Level_Control_Packet)
-	if feedback_level_control_pkg.Result == 0 {
-		base.Gateway_Set_Device_Status(conn.Gateway, feedback_level_control_pkg.DeviceID, feedback_level_control_pkg.Endpoint, feedback_level_control_pkg.Action)
-	}
+	//if feedback_level_control_pkg.Status == 0 {
+	base.Gateway_Set_Device_Status(conn.Gateway, feedback_level_control_pkg.DeviceID, feedback_level_control_pkg.Endpoint, feedback_level_control_pkg.Level)
+	//	}
 	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 }
 

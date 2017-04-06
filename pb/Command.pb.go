@@ -28,19 +28,20 @@ type Command_CommandType int32
 const (
 	Command_CMT_INVALID Command_CommandType = 0
 	// gateway->web message
-	Command_CMT_REQ_LOGIN          Command_CommandType = 1
-	Command_CMT_REP_ONLINE         Command_CommandType = 2
-	Command_CMT_REP_ADD_DEL_DEVICE Command_CommandType = 5
-	Command_CMT_REP_NOTIFICATION   Command_CommandType = 6
-	Command_CMT_REP_SETNAME        Command_CommandType = 8
-	Command_CMT_REP_DEL_DEVICE     Command_CommandType = 10
-	Command_CMT_REP_DEVICE_ATTR    Command_CommandType = 11
-	Command_CMT_REP_DEPLOYMENT     Command_CommandType = 15
-	Command_CMT_REP_ONOFF          Command_CommandType = 19
-	Command_CMT_REP_DEVICE_ONLINE  Command_CommandType = 21
-	Command_CMT_REP_NOTIFY_ONOFF   Command_CommandType = 22
-	Command_CMT_REP_DEVICELIST     Command_CommandType = 2049
-	Command_CMT_REP_NOTIFY_LEVEL   Command_CommandType = 24
+	Command_CMT_REQ_LOGIN            Command_CommandType = 1
+	Command_CMT_REP_ONLINE           Command_CommandType = 2
+	Command_CMT_REP_ADD_DEL_DEVICE   Command_CommandType = 5
+	Command_CMT_REP_NOTIFICATION     Command_CommandType = 6
+	Command_CMT_REP_SETNAME          Command_CommandType = 8
+	Command_CMT_REP_DEL_DEVICE       Command_CommandType = 10
+	Command_CMT_REP_DEVICE_ATTR      Command_CommandType = 11
+	Command_CMT_REP_DEPLOYMENT       Command_CommandType = 15
+	Command_CMT_REP_ONOFF            Command_CommandType = 19
+	Command_CMT_REP_DEVICE_ONLINE    Command_CommandType = 21
+	Command_CMT_REP_NOTIFY_ONOFF     Command_CommandType = 23
+	Command_CMT_REP_DEVICELIST       Command_CommandType = 2049
+	Command_CMT_REP_NOTIFY_LEVEL     Command_CommandType = 25
+	Command_CMT_REP_FEEDBACK_UPGRADE Command_CommandType = 34
 	// web->gateway
 	Command_CMT_REP_LOGIN                  Command_CommandType = 32769
 	Command_CMT_REQ_ONLINE                 Command_CommandType = 32770
@@ -56,6 +57,7 @@ const (
 	Command_CMT_REQ_ONOFF_STATUS           Command_CommandType = 32790
 	Command_CMT_REQ_DEVICELIST             Command_CommandType = 34817
 	Command_CMT_REQ_READ_DEPLOYMENT_STATUS Command_CommandType = 32799
+	Command_CMT_REQ_UPGRADE                Command_CommandType = 32802
 )
 
 var Command_CommandType_name = map[int32]string{
@@ -70,9 +72,10 @@ var Command_CommandType_name = map[int32]string{
 	15:    "CMT_REP_DEPLOYMENT",
 	19:    "CMT_REP_ONOFF",
 	21:    "CMT_REP_DEVICE_ONLINE",
-	22:    "CMT_REP_NOTIFY_ONOFF",
+	23:    "CMT_REP_NOTIFY_ONOFF",
 	2049:  "CMT_REP_DEVICELIST",
-	24:    "CMT_REP_NOTIFY_LEVEL",
+	25:    "CMT_REP_NOTIFY_LEVEL",
+	34:    "CMT_REP_FEEDBACK_UPGRADE",
 	32769: "CMT_REP_LOGIN",
 	32770: "CMT_REQ_ONLINE",
 	32776: "CMT_REQ_SETNAME",
@@ -87,6 +90,7 @@ var Command_CommandType_name = map[int32]string{
 	32790: "CMT_REQ_ONOFF_STATUS",
 	34817: "CMT_REQ_DEVICELIST",
 	32799: "CMT_REQ_READ_DEPLOYMENT_STATUS",
+	32802: "CMT_REQ_UPGRADE",
 }
 var Command_CommandType_value = map[string]int32{
 	"CMT_INVALID":                    0,
@@ -100,9 +104,10 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_DEPLOYMENT":             15,
 	"CMT_REP_ONOFF":                  19,
 	"CMT_REP_DEVICE_ONLINE":          21,
-	"CMT_REP_NOTIFY_ONOFF":           22,
+	"CMT_REP_NOTIFY_ONOFF":           23,
 	"CMT_REP_DEVICELIST":             2049,
-	"CMT_REP_NOTIFY_LEVEL":           24,
+	"CMT_REP_NOTIFY_LEVEL":           25,
+	"CMT_REP_FEEDBACK_UPGRADE":       34,
 	"CMT_REP_LOGIN":                  32769,
 	"CMT_REQ_ONLINE":                 32770,
 	"CMT_REQ_SETNAME":                32776,
@@ -117,6 +122,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REQ_ONOFF_STATUS":           32790,
 	"CMT_REQ_DEVICELIST":             34817,
 	"CMT_REQ_READ_DEPLOYMENT_STATUS": 32799,
+	"CMT_REQ_UPGRADE":                32802,
 }
 
 func (x Command_CommandType) String() string {

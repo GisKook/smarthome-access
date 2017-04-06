@@ -90,6 +90,14 @@ func Nsq_EventHandler(gatewayid uint64, serialnum uint32, command *Report.Comman
 			pkg := protocol.Parse_NSQ_Read_OnOff_Status(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE, command.Paras)
 			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
 		}
+	case Report.Command_CMT_REQ_UPGRADE:
+		if c != nil {
+			pkg := protocol.Parse_NSQ_Upgrade(gatewayid, serialnum, protocol.GATEWAY_ON_LINE)
+			c.SendToGateway(pkg)
+		} else {
+			pkg := protocol.Parse_NSQ_Upgrade(gatewayid, serialnum, protocol.GATEWAY_OFF_LINE)
+			GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, pkg.Serialize())
+		}
 
 	}
 }

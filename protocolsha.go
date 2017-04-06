@@ -13,32 +13,33 @@ type ShaPacket struct {
 }
 
 func (this *ShaPacket) Serialize() []byte {
-	switch this.Type {
-	case protocol.Login:
-		return this.Packet.(*protocol.LoginPacket).Serialize()
-	case protocol.HeartBeat:
-		return this.Packet.(*protocol.HeartPacket).Serialize()
-	case protocol.Notification:
-		return this.Packet.(*protocol.Notification_Packet).Serialize()
-	case protocol.Add_Del_Device:
-		return this.Packet.(*protocol.Add_Del_Device_Packet).Serialize()
-	case protocol.Feedback_SetName:
-		return this.Packet.(*protocol.Feedback_SetName_Packet).Serialize()
-	case protocol.Feedback_Del_Device:
-		return this.Packet.(*protocol.Feedback_Del_Device_Packet).Serialize()
-	case protocol.Feedback_Query_Attr:
-		return this.Packet.(*protocol.Feedback_Query_Attr_Packet).Serialize()
-	case protocol.Feedback_Depolyment:
-		return this.Packet.(*protocol.Feedback_Deployment_Packet).Serialize()
-	case protocol.Feedback_OnOff:
-		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
-	case protocol.Feedback_Level_Control:
-		return this.Packet.(*protocol.Feedback_Level_Control_Packet).Serialize()
-	case protocol.Notify_OnOff:
-		return this.Packet.(*protocol.Notify_OnOff_Packet).Serialize()
-	}
-
-	return nil
+	return this.Packet.Serialize()
+	//	switch this.Type {
+	//	case protocol.Login:
+	//		return this.Packet.(*protocol.LoginPacket).Serialize()
+	//	case protocol.HeartBeat:
+	//		return this.Packet.(*protocol.HeartPacket).Serialize()
+	//	case protocol.Notification:
+	//		return this.Packet.(*protocol.Notification_Packet).Serialize()
+	//	case protocol.Add_Del_Device:
+	//		return this.Packet.(*protocol.Add_Del_Device_Packet).Serialize()
+	//	case protocol.Feedback_SetName:
+	//		return this.Packet.(*protocol.Feedback_SetName_Packet).Serialize()
+	//	case protocol.Feedback_Del_Device:
+	//		return this.Packet.(*protocol.Feedback_Del_Device_Packet).Serialize()
+	//	case protocol.Feedback_Query_Attr:
+	//		return this.Packet.(*protocol.Feedback_Query_Attr_Packet).Serialize()
+	//	case protocol.Feedback_Depolyment:
+	//		return this.Packet.(*protocol.Feedback_Deployment_Packet).Serialize()
+	//	case protocol.Feedback_OnOff:
+	//		return this.Packet.(*protocol.Feedback_OnOff_Packet).Serialize()
+	//	case protocol.Feedback_Level_Control:
+	//		return this.Packet.(*protocol.Feedback_Level_Control_Packet).Serialize()
+	//	case protocol.Notify_OnOff:
+	//		return this.Packet.(*protocol.Notify_OnOff_Packet).Serialize()
+	//	}
+	//
+	//	return nil
 }
 
 func NewShaPacket(Type uint16, Packet gotcp.Packet) *ShaPacket {
@@ -128,6 +129,11 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			pkg := protocol.Parse_Notify_Online_Status(pkgbyte, smconn.ID)
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.Notify_Online_Status, pkg), nil
+		case protocol.Feedback_Upgrade:
+			pkg := protocol.Parse_Feedback_Upgrade(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+
+			return NewShaPacket(protocol.Feedback_Upgrade, pkg), nil
 
 		case protocol.Illegal:
 			smconn.ReadMore = true

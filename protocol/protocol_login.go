@@ -6,6 +6,7 @@ import (
 	"github.com/giskook/smarthome-access/base"
 	"github.com/giskook/smarthome-access/pb"
 	"github.com/golang/protobuf/proto"
+	"log"
 	"time"
 )
 
@@ -49,6 +50,7 @@ func (p *LoginPacket) Serialize() []byte {
 
 func (p *LoginPacket) Serialize2Pis(index int) []byte {
 	device := p.Gateway.Devices[index]
+	log.Println(device)
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT64,
@@ -128,7 +130,11 @@ func ParseLogin(buffer []byte) *LoginPacket {
 			endpoints[j].DeviceTypeID = base.ReadWord(reader)
 			if endpoints[j].DeviceTypeID == base.SS_Device_DeviceTypeID {
 				endpoints[j].Zonetype = base.ReadWord(reader)
-			} else if endpoints[j].DeviceTypeID == base.MPO_Device_DeviceTypeID || endpoints[j].DeviceTypeID == base.Shade_Device_DeviceTypeID || endpoints[j].DeviceTypeID == base.HA_Device_ON_OFF_Output_DeviceTypeID {
+			}
+			if endpoints[j].DeviceTypeID == base.MPO_Device_DeviceTypeID ||
+				endpoints[j].DeviceTypeID == base.Shade_Device_DeviceTypeID ||
+				endpoints[j].DeviceTypeID == base.HA_Device_ON_OFF_Output_DeviceTypeID ||
+				endpoints[j].DeviceTypeID == base.SS_Device_DeviceTypeID {
 				endpoints[j].Status, _ = reader.ReadByte()
 			}
 		}

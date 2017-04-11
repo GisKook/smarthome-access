@@ -17,6 +17,10 @@ func (p *Feedback_Upgrade_Packet) Serialize() []byte {
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(GATEWAY_ON_LINE),
 		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: 0,
+		},
 	}
 
 	command := &Report.Command{

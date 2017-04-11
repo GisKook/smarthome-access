@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/giskook/smarthome-access/base"
-	//"github.com/giskook/smarthome-access/pb"
-	//"github.com/golang/protobuf/proto"
+	"github.com/giskook/smarthome-access/pb"
+	"github.com/golang/protobuf/proto"
 	"time"
 )
 
 const CMD_LOGIN uint16 = 0x8001
 const CMD_LOGIN_LEN uint16 = 0x12
+
+const ACTION_UPDATE_PIS uint8 = 5
 
 type LoginPacket struct {
 	Gateway *base.Gateway
@@ -43,6 +45,60 @@ func (p *LoginPacket) Serialize() []byte {
 	writer.WriteByte(ENDFLAG)
 
 	return writer.Bytes()
+}
+
+func (p *LoginPacket) Serialize2Pis(index int) []byte {
+	device := p.Gateway.Devices[index]
+	para := []*Report.Command_Param{
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT64,
+			Npara: device.ID,
+		},
+		&Report.Command_Param{
+			Type:    Report.Command_Param_STRING,
+			Strpara: device.Name,
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(ACTION_UPDATE_PIS),
+		},
+	}
+	endpoint_count := uint8(len(device.Endpoints))
+	para = append(para, &Report.Command_Param{
+		Type:  Report.Command_Param_UINT8,
+		Npara: uint64(endpoint_count),
+	})
+	for i := uint8(0); i < endpoint_count; i++ {
+		para = append(para, &Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(device.Endpoints[i].Endpoint),
+		})
+		para = append(para, &Report.Command_Param{
+			Type:  Report.Command_Param_UINT16,
+			Npara: uint64(device.Endpoints[i].DeviceTypeID),
+		})
+		if device.Endpoints[i].DeviceTypeID == base.SS_Device_DeviceTypeID {
+			para = append(para, &Report.Command_Param{
+				Type:  Report.Command_Param_UINT16,
+				Npara: uint64(device.Endpoints[i].Zonetype),
+			})
+		}
+
+	}
+	command := &Report.Command{
+		Type:  Report.Command_CMT_REP_ADD_DEL_DEVICE,
+		Paras: para,
+	}
+
+	add_del_device_pkg := &Report.ControlReport{
+		Tid:          p.Gateway.ID,
+		SerialNumber: 0,
+		Command:      command,
+	}
+
+	data, _ := proto.Marshal(add_del_device_pkg)
+
+	return data
 }
 
 func ParseLogin(buffer []byte) *LoginPacket {

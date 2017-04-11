@@ -1,8 +1,8 @@
 {  
 	"NsqConfig":{  
 		"Addr":"192.168.2.67:4150",
-			"UpTopic":"sha2app",
-			"DownTopic":"app2sha",
+			"UpTopic":"das2app2",
+			"DownTopic":"app2das2",
 			"Downchannel":"ch"
 	},
 	"ServerConfig":{

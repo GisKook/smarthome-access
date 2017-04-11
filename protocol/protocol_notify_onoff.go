@@ -17,12 +17,12 @@ type Notify_OnOff_Packet struct {
 func (p *Notify_OnOff_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.EndPoint),
-		},
-		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT64,
 			Npara: p.DeviceID,
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.EndPoint),
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,

@@ -45,6 +45,11 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	conn.ID = conn.Gateway.ID
 	NewConns().SetID(conn.ID, conn)
 	c.AsyncWritePacket(p, time.Second)
+
+	device_count := len(loginPkg.Gateway.Devices)
+	for i := 0; i < device_count; i++ {
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, loginPkg.Serialize2Pis(i))
+	}
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {
@@ -149,6 +154,8 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Notify_Online_Status:
 		on_notify_online(c, shaPacket)
+	case protocol.Feedback_Upgrade:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	}
 
 	return true

@@ -64,6 +64,14 @@ func (p *LoginPacket) Serialize2Pis(index int) []byte {
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(ACTION_UPDATE_PIS),
 		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Gateway.BoxVersion),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Gateway.ProtocolVersion),
+		},
 	}
 	endpoint_count := uint8(len(device.Endpoints))
 	para = append(para, &Report.Command_Param{

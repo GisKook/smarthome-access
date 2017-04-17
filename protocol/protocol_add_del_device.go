@@ -10,10 +10,12 @@ const ADD_DEVICE uint8 = 1
 const DEL_DEVICE uint8 = 0
 
 type Add_Del_Device_Packet struct {
-	GatewayID uint64
-	Name      string
-	Action    uint8
-	Device    *base.Device
+	GatewayID       uint64
+	BoxVersion      uint8
+	ProtocolVersion uint8
+	Name            string
+	Action          uint8
+	Device          *base.Device
 }
 
 func (p *Add_Del_Device_Packet) Serialize() []byte {
@@ -29,6 +31,14 @@ func (p *Add_Del_Device_Packet) Serialize() []byte {
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.Action),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.BoxVersion),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.ProtocolVersion),
 		},
 	}
 	if p.Action == ADD_DEVICE {
@@ -73,7 +83,7 @@ func (p *Add_Del_Device_Packet) Serialize() []byte {
 	return data
 }
 
-func Parse_Add_Del_Device(buffer []byte, id uint64) *Add_Del_Device_Packet {
+func Parse_Add_Del_Device(buffer []byte, id uint64, boxversion byte, protocol_version byte) *Add_Del_Device_Packet {
 	reader := ParseHeader(buffer)
 	action, _ := reader.ReadByte()
 	deviceid := base.ReadQuaWord(reader)
@@ -99,9 +109,11 @@ func Parse_Add_Del_Device(buffer []byte, id uint64) *Add_Del_Device_Packet {
 	}
 
 	return &Add_Del_Device_Packet{
-		GatewayID: id,
-		Name:      name,
-		Action:    action,
-		Device:    &device,
+		GatewayID:       id,
+		BoxVersion:      uint8(boxversion),
+		ProtocolVersion: uint8(protocol_version),
+		Name:            name,
+		Action:          action,
+		Device:          &device,
 	}
 }

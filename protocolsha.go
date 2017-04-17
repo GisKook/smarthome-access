@@ -89,7 +89,7 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.HeartBeat, pkg), nil
 		case protocol.Add_Del_Device:
-			pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID)
+			pkg := protocol.Parse_Add_Del_Device(pkgbyte, smconn.ID, smconn.Gateway.BoxVersion, smconn.Gateway.ProtocolVersion)
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.Add_Del_Device, pkg), nil
 		case protocol.Notification:

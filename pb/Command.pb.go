@@ -42,6 +42,7 @@ const (
 	Command_CMT_REP_DEVICELIST       Command_CommandType = 2049
 	Command_CMT_REP_NOTIFY_LEVEL     Command_CommandType = 25
 	Command_CMT_REP_FEEDBACK_UPGRADE Command_CommandType = 34
+	Command_CMT_REP_NOTIFY_GATEWAY   Command_CommandType = 257
 	// web->gateway
 	Command_CMT_REP_LOGIN                  Command_CommandType = 32769
 	Command_CMT_REQ_ONLINE                 Command_CommandType = 32770
@@ -76,6 +77,7 @@ var Command_CommandType_name = map[int32]string{
 	2049:  "CMT_REP_DEVICELIST",
 	25:    "CMT_REP_NOTIFY_LEVEL",
 	34:    "CMT_REP_FEEDBACK_UPGRADE",
+	257:   "CMT_REP_NOTIFY_GATEWAY",
 	32769: "CMT_REP_LOGIN",
 	32770: "CMT_REQ_ONLINE",
 	32776: "CMT_REQ_SETNAME",
@@ -108,6 +110,7 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_DEVICELIST":             2049,
 	"CMT_REP_NOTIFY_LEVEL":           25,
 	"CMT_REP_FEEDBACK_UPGRADE":       34,
+	"CMT_REP_NOTIFY_GATEWAY":         257,
 	"CMT_REP_LOGIN":                  32769,
 	"CMT_REQ_ONLINE":                 32770,
 	"CMT_REQ_SETNAME":                32776,

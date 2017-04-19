@@ -46,10 +46,11 @@ func on_login(c *gotcp.Conn, p *ShaPacket) {
 	NewConns().SetID(conn.ID, conn)
 	c.AsyncWritePacket(p, time.Second)
 
-	device_count := len(loginPkg.Gateway.Devices)
-	for i := 0; i < device_count; i++ {
-		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, loginPkg.Serialize2Pis(i))
-	}
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, loginPkg.SerializeOnePkg())
+	//device_count := len(loginPkg.Gateway.Devices)
+	//for i := 0; i < device_count; i++ {
+	//GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, loginPkg.Serialize2Pis(i))
+	//}
 }
 
 func on_add_del_device(c *gotcp.Conn, p *ShaPacket) {

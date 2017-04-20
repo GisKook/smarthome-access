@@ -118,6 +118,14 @@ func (p *LoginPacket) SerializeOnePkg() []byte {
 			Type:    Report.Command_Param_STRING,
 			Strpara: p.Gateway.Name,
 		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Gateway.BoxVersion),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Gateway.ProtocolVersion),
+		},
 	}
 	//log.Printf("gateway name %s\n", p.Gateway.Name)
 	device_count := len(p.Gateway.Devices)

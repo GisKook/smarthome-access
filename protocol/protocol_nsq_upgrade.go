@@ -21,7 +21,7 @@ func (p *Nsq_Upgrade_Packet) SerializeOnline() []byte {
 	base.WriteWord(&writer, 0)
 	base.WriteWord(&writer, CMD_UPGRADE)
 	base.WriteDWord(&writer, p.SerialNum)
-	base.WriteQuaWord(&writer, p.GatewayID)
+	base.WriteMacBytes(&writer, p.GatewayID)
 	writer.WriteByte(0)
 	base.WriteLength(&writer)
 	writer.WriteByte(CheckSum(writer.Bytes(), uint16(writer.Len())))

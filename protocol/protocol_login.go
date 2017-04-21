@@ -168,13 +168,17 @@ func (p *LoginPacket) SerializeOnePkg() []byte {
 				Npara: uint64(devicetypeid),
 			})
 			//log.Printf("device %d endpoint %d devicetype id %d\n", i, p.Gateway.Devices[i].Endpoints[j].Endpoint, devicetypeid)
-			if devicetypeid == 0x0402 {
+			if devicetypeid == base.SS_Device_DeviceTypeID {
 				para = append(para, &Report.Command_Param{
 					Type:  Report.Command_Param_UINT16,
 					Npara: uint64(p.Gateway.Devices[i].Endpoints[j].Zonetype),
 				})
 				//log.Printf("device %d endpoint %d zonetype %d\n", i, p.Gateway.Devices[i].Endpoints[j].Endpoint, p.Gateway.Devices[i].Endpoints[j].Zonetype)
-			} else if devicetypeid == base.MPO_Device_DeviceTypeID || devicetypeid == base.Shade_Device_DeviceTypeID || devicetypeid == base.HA_Device_ON_OFF_Output_DeviceTypeID {
+			}
+			if devicetypeid == base.SS_Device_DeviceTypeID ||
+				devicetypeid == base.MPO_Device_DeviceTypeID ||
+				devicetypeid == base.Shade_Device_DeviceTypeID ||
+				devicetypeid == base.HA_Device_ON_OFF_Output_DeviceTypeID {
 				para = append(para, &Report.Command_Param{
 					Type:  Report.Command_Param_UINT8,
 					Npara: uint64(p.Gateway.Devices[i].Endpoints[j].Status),
@@ -182,6 +186,7 @@ func (p *LoginPacket) SerializeOnePkg() []byte {
 			}
 		}
 	}
+	log.Println(para)
 	command := &Report.Command{
 		Type:  Report.Command_CMT_REP_NOTIFY_GATEWAY,
 		Paras: para,

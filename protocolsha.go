@@ -134,6 +134,20 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			smconn.ReadMore = false
 
 			return NewShaPacket(protocol.Feedback_Upgrade, pkg), nil
+		case protocol.Notify_Temperature:
+			pkg := protocol.Parse_Notify_Timperature(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+			return NewShaPacket(protocol.Notify_Temperature, pkg), nil
+		case protocol.Notify_Humidity:
+			pkg := protocol.Parse_Notify_Humidity(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+
+			return NewShaPacket(protocol.Notify_Humidity, pkg), nil
+		case protocol.Notify_Security_Aids:
+			pkg := protocol.Parse_Notify_Security_Aids(pkgbyte, smconn.ID)
+			smconn.ReadMore = false
+
+			return NewShaPacket(protocol.Notify_Humidity, pkg), nil
 
 		case protocol.Illegal:
 			smconn.ReadMore = true

@@ -157,6 +157,12 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		on_notify_online(c, shaPacket)
 	case protocol.Feedback_Upgrade:
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Notify_Temperature:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Notify_Humidity:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Notify_Security_Aids:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	}
 
 	return true

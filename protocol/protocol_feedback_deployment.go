@@ -27,6 +27,10 @@ func (p *Feedback_Deployment_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(p.Result),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.ArmModel),
 		},
 		&Report.Command_Param{
@@ -44,10 +48,6 @@ func (p *Feedback_Deployment_Packet) Serialize() []byte {
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.EndTimeMin),
-		},
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Result),
 		},
 	}
 

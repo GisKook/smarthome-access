@@ -22,6 +22,10 @@ func (p *Feedback_Level_Control_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
+			Npara: uint64(0),
+		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.Level),
 		},
 	}

@@ -59,7 +59,7 @@ func (p *Notification_Packet) Serialize() []byte {
 func Parse_Notification(buffer []byte, id uint64) *Notification_Packet {
 	reader := ParseHeader(buffer)
 	deviceid := base.ReadQuaWord(reader)
-	notification_time := base.ReadQuaWord(reader) + 8*60*60
+	notification_time := base.ReadQuaWord(reader)
 	endpoint, _ := reader.ReadByte()
 	devicetypeid := base.ReadWord(reader)
 	zonetype := base.ReadWord(reader)

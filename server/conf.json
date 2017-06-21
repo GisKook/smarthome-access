@@ -1,6 +1,6 @@
 {  
 	"NsqConfig":{  
-		"Addr":"192.168.2.67:4150",
+		"Addr":"192.168.2.66:4150",
 			"UpTopic":"das2app2",
 			"DownTopic":"app2das2",
 			"Downchannel":"ch"

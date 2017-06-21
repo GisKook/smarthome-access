@@ -46,6 +46,8 @@ const (
 	Command_CMT_REP_NOTIFY_TEMPERATURE   Command_CommandType = 36
 	Command_CMT_REP_NOTIFY_HUMIDITY      Command_CommandType = 37
 	Command_CMT_REP_NOTIFY_SECURITY_AIDS Command_CommandType = 48
+	Command_CMT_REP_FEEDBACK_LEVEL       Command_CommandType = 17
+	Command_CMT_REP_FEEDBACK_WARN        Command_CommandType = 13
 	// web->gateway
 	Command_CMT_REP_LOGIN                  Command_CommandType = 32769
 	Command_CMT_REQ_ONLINE                 Command_CommandType = 32770
@@ -84,6 +86,8 @@ var Command_CommandType_name = map[int32]string{
 	36:    "CMT_REP_NOTIFY_TEMPERATURE",
 	37:    "CMT_REP_NOTIFY_HUMIDITY",
 	48:    "CMT_REP_NOTIFY_SECURITY_AIDS",
+	17:    "CMT_REP_FEEDBACK_LEVEL",
+	13:    "CMT_REP_FEEDBACK_WARN",
 	32769: "CMT_REP_LOGIN",
 	32770: "CMT_REQ_ONLINE",
 	32776: "CMT_REQ_SETNAME",
@@ -120,6 +124,8 @@ var Command_CommandType_value = map[string]int32{
 	"CMT_REP_NOTIFY_TEMPERATURE":     36,
 	"CMT_REP_NOTIFY_HUMIDITY":        37,
 	"CMT_REP_NOTIFY_SECURITY_AIDS":   48,
+	"CMT_REP_FEEDBACK_LEVEL":         17,
+	"CMT_REP_FEEDBACK_WARN":          13,
 	"CMT_REP_LOGIN":                  32769,
 	"CMT_REQ_ONLINE":                 32770,
 	"CMT_REQ_SETNAME":                32776,

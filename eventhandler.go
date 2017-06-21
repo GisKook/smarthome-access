@@ -163,6 +163,8 @@ func (this *Callback) OnMessage(c *gotcp.Conn, p gotcp.Packet) bool {
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	case protocol.Notify_Security_Aids:
 		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
+	case protocol.Feedback_Warn:
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 	}
 
 	return true

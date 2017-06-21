@@ -6,16 +6,16 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-type Feedback_Level_Control_Packet struct {
+type Feedback_Warn_Packet struct {
 	GatewayID uint64
 	SerialNum uint32
 	DeviceID  uint64
 	Endpoint  uint8
-	Level     uint8
-	Result    uint8
+	CommandID uint8
+	Status    uint8
 }
 
-func (p *Feedback_Level_Control_Packet) Serialize() []byte {
+func (p *Feedback_Warn_Packet) Serialize() []byte {
 	para := []*Report.Command_Param{
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
@@ -23,44 +23,40 @@ func (p *Feedback_Level_Control_Packet) Serialize() []byte {
 		},
 		&Report.Command_Param{
 			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Result),
-		},
-		&Report.Command_Param{
-			Type:  Report.Command_Param_UINT8,
-			Npara: uint64(p.Level),
+			Npara: uint64(p.Status),
 		},
 	}
-
 	command := &Report.Command{
-		Type:  Report.Command_CMT_REP_FEEDBACK_LEVEL,
+		Type:  Report.Command_CMT_REP_FEEDBACK_WARN,
 		Paras: para,
 	}
 
-	feedback_level_control_pkg := &Report.ControlReport{
+	feedback_warn_pkg := &Report.ControlReport{
 		Tid:          p.GatewayID,
 		SerialNumber: p.SerialNum,
 		Command:      command,
 	}
 
-	data, _ := proto.Marshal(feedback_level_control_pkg)
+	data, _ := proto.Marshal(feedback_warn_pkg)
 
 	return data
 }
 
-func Parse_Feedback_Level_Control(buffer []byte, id uint64) *Feedback_Level_Control_Packet {
+func Parse_Feedback_Warn(buffer []byte, id uint64) *Feedback_Warn_Packet {
+
 	reader := ParseHeader(buffer)
 	serialnum := base.ReadDWord(reader)
 	deviceid := base.ReadQuaWord(reader)
 	endpoint, _ := reader.ReadByte()
-	level, _ := reader.ReadByte()
-	result, _ := reader.ReadByte()
+	commandid, _ := reader.ReadByte()
+	status, _ := reader.ReadByte()
 
-	return &Feedback_Level_Control_Packet{
+	return &Feedback_Warn_Packet{
 		GatewayID: id,
 		SerialNum: serialnum,
 		DeviceID:  deviceid,
 		Endpoint:  endpoint,
-		Level:     level,
-		Result:    result,
+		CommandID: commandid,
+		Status:    status,
 	}
 }

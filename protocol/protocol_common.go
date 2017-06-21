@@ -28,8 +28,9 @@ var (
 	Feedback_Query_Attr    uint16 = 11
 	Feedback_Depolyment    uint16 = 15
 	Feedback_OnOff         uint16 = 16
+	Feedback_Warn          uint16 = 0x000d
 	Notify_OnOff           uint16 = 0x0017
-	Feedback_Level_Control uint16 = 18
+	Feedback_Level_Control uint16 = 0x0011
 	Notify_Level           uint16 = 0x0019
 	Notify_Online_Status   uint16 = 0x0020
 	Feedback_Upgrade       uint16 = 0x0022

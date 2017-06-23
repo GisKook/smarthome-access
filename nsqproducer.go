@@ -2,7 +2,7 @@ package sha
 
 import (
 	"log"
-	//"sync"
+	"sync"
 
 	"github.com/bitly/go-nsq"
 )
@@ -16,7 +16,8 @@ type NsqProducer struct {
 	config *NsqProducerConfig
 	//waitGroup *sync.WaitGroup
 
-	producer *nsq.Producer
+	producer       *nsq.Producer
+	mutex_producer sync.Mutex
 }
 
 func NewNsqProducer(config *NsqProducerConfig) *NsqProducer {
@@ -27,6 +28,8 @@ func NewNsqProducer(config *NsqProducerConfig) *NsqProducer {
 }
 
 func (s *NsqProducer) Send(topic string, value []byte) error {
+	defer s.mutex_producer.Unlock()
+	s.mutex_producer.Lock()
 	log.Printf("<OUT_NSQ> topic %s %x \n", topic, value)
 	err := s.producer.PublishAsync(topic, value, nil, nil)
 

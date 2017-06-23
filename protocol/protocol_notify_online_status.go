@@ -26,7 +26,7 @@ func (p *Notify_Online_Status_Packet) Serialize() []byte {
 	}
 
 	command := &Report.Command{
-		Type:  Report.Command_CMT_REP_NOTIFY_ONOFF,
+		Type:  Report.Command_CMT_REP_NOTIFY_ONLINE_STATUS,
 		Paras: para,
 	}
 

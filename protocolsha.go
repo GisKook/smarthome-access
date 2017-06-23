@@ -76,11 +76,13 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 		}
 
 		cmdid, pkglen := protocol.CheckProtocol(buffer)
+		log.Printf("cmdid %d pkglen %d\n", cmdid, pkglen)
 
 		pkgbyte := make([]byte, pkglen)
 		buffer.Read(pkgbyte)
 		switch cmdid {
 		case protocol.Login:
+			log.Println("protocol.Login")
 			pkg := protocol.ParseLogin(pkgbyte)
 			smconn.ReadMore = false
 			return NewShaPacket(protocol.Login, pkg), nil

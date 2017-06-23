@@ -55,7 +55,7 @@ func CheckSum(cmd []byte, cmdlen uint16) byte {
 	return temp
 }
 func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
-	//log.Printf("check protocol %x\n", buffer.Bytes())
+	log.Printf("check protocol %x\n", buffer.Bytes())
 	bufferlen := buffer.Len()
 	if bufferlen == 0 {
 		return Illegal, 0
@@ -73,6 +73,7 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 			CheckProtocol(buffer)
 		}
 		if int(pkglen) > bufferlen {
+			log.Printf("half 1 %d %d", pkglen, bufferlen)
 			return HalfPack, 0
 		} else {
 			checksum := CheckSum(buffer.Bytes(), pkglen-2)
@@ -87,8 +88,11 @@ func CheckProtocol(buffer *bytes.Buffer) (uint16, uint16) {
 			}
 		}
 	} else {
+		log.Println("half 2")
 		return HalfPack, 0
 	}
+
+	log.Println("half 3")
 
 	return HalfPack, 0
 }

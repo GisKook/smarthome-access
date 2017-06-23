@@ -4,6 +4,7 @@ import (
 	"github.com/giskook/gotcp"
 	"log"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -22,12 +23,16 @@ type Server struct {
 }
 
 var Gserver *Server
+var GMutexServer sync.Mutex
 
 func SetServer(server *Server) {
 	Gserver = server
 }
 
 func GetServer() *Server {
+	defer GMutexServer.Unlock()
+	GMutexServer.Lock()
+
 	return Gserver
 }
 

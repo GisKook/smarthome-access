@@ -38,6 +38,8 @@ func (this *Callback) OnClose(c *gotcp.Conn) {
 }
 
 func on_login(c *gotcp.Conn, p *ShaPacket) {
+	log.Println("on_login")
+
 	conn := c.GetExtraData().(*Conn)
 	conn.Status = ConnSuccess
 	loginPkg := p.Packet.(*protocol.LoginPacket)
@@ -121,6 +123,7 @@ func on_notify_online(c *gotcp.Conn, p *ShaPacket) {
 	conn := c.GetExtraData().(*Conn)
 	notify_online_pkg := p.Packet.(*protocol.Notify_Online_Status_Packet)
 	base.Gateway_Set_Device_Online(conn.Gateway, notify_online_pkg.DeviceID, notify_online_pkg.Status)
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, p.Serialize())
 
 }
 

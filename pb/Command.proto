@@ -6,28 +6,29 @@ message Command {
 		CMT_INVALID          = 0x0000;  // unillgle
 
 		// gateway->web message
-		CMT_REQ_LOGIN                = 0x0001;
-		CMT_REP_ONLINE               = 0x0002;
-		CMT_REP_ADD_DEL_DEVICE       = 0x0005;  // for mosqitto
-		CMT_REP_NOTIFICATION         = 0x0006;  // for mosqitto
-		CMT_REP_SETNAME              = 0x0008;
-		CMT_REP_DEL_DEVICE           = 0x000a;
-		CMT_REP_DEVICE_ATTR          = 0x000b;
-		CMT_REP_DEPLOYMENT           = 0x000f;
-		CMT_REP_ONOFF                = 0x0013;  // only for onoff device
-		CMT_REP_DEVICE_ONLINE        = 0x0015;  // unsupport right now
-		CMT_REP_NOTIFY_ONOFF         = 0x0017;  // unsupport right now only for onoff deivce
-		CMT_REP_DEVICELIST           = 0x0801; 
-		CMT_REP_NOTIFY_LEVEL         = 0x0019;
-		CMT_REP_FEEDBACK_UPGRADE     = 0x0022;
+		CMT_REQ_LOGIN                  = 0x0001;
+		CMT_REP_ONLINE                 = 0x0002;
+		CMT_REP_ADD_DEL_DEVICE         = 0x0005;  // for mosqitto
+		CMT_REP_NOTIFICATION           = 0x0006;  // for mosqitto
+		CMT_REP_SETNAME                = 0x0008;
+		CMT_REP_DEL_DEVICE             = 0x000a;
+		CMT_REP_DEVICE_ATTR            = 0x000b;
+		CMT_REP_DEPLOYMENT             = 0x000f;
+		CMT_REP_ONOFF                  = 0x0013;  // only for onoff device
+		CMT_REP_DEVICE_ONLINE          = 0x0015;  // unsupport right now
+		CMT_REP_NOTIFY_ONOFF           = 0x0017;  // unsupport right now only for onoff deivce
+		CMT_REP_DEVICELIST             = 0x0801; 
+		CMT_REP_NOTIFY_LEVEL           = 0x0019;
+		CMT_REP_FEEDBACK_UPGRADE       = 0x0022;
 		
-		CMT_REP_NOTIFY_GATEWAY       = 0x0101;
-		CMT_REP_NOTIFY_TEMPERATURE   = 0x0024;
-		CMT_REP_NOTIFY_HUMIDITY      = 0x0025;
-		CMT_REP_NOTIFY_SECURITY_AIDS = 0x0030;
-		CMT_REP_NOTIFY_ONLINE_STATUS = 0x0020;
-		CMT_REP_FEEDBACK_LEVEL       = 0x0011;
-		CMT_REP_FEEDBACK_WARN        = 0x000d;
+		CMT_REP_NOTIFY_GATEWAY         = 0x0101;
+		CMT_REP_NOTIFY_TEMPERATURE     = 0x0024;
+		CMT_REP_NOTIFY_HUMIDITY        = 0x0025;
+		CMT_REP_NOTIFY_SECURITY_AIDS   = 0x0030;
+		CMT_REP_NOTIFY_ONLINE_STATUS   = 0x0020;
+		CMT_REP_FEEDBACK_LEVEL         = 0x0011;
+		CMT_REP_FEEDBACK_WARN          = 0x000d;
+		CMT_REP_NOTIFY_GATEWAY_OFFLINE = 0x0102;
 		
 		
 		// web->gateway

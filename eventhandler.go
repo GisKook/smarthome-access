@@ -32,6 +32,10 @@ func (this *Callback) OnConnect(c *gotcp.Conn) bool {
 
 func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData().(*Conn)
+	notify_gateway_offline_pkg := &protocol.Notify_Gateway_Offline_Packet{
+		GatewayID: conn.ID,
+	}
+	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, notify_gateway_offline_pkg.Serialize())
 	conn.Close()
 	NewConns().Remove(conn)
 	log.Println(NewConns())

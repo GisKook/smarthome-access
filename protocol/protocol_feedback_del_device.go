@@ -23,6 +23,10 @@ func (p *Feedback_Del_Device_Packet) Serialize() []byte {
 			Type:  Report.Command_Param_UINT8,
 			Npara: uint64(p.Result),
 		},
+		&Report.Command_Param{
+			Type:  Report.Command_Param_UINT64,
+			Npara: uint64(p.DeviceID),
+		},
 	}
 
 	command := &Report.Command{

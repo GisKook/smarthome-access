@@ -35,9 +35,11 @@ func (this *Callback) OnClose(c *gotcp.Conn) {
 	notify_gateway_offline_pkg := &protocol.Notify_Gateway_Offline_Packet{
 		GatewayID: conn.ID,
 	}
-	GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, notify_gateway_offline_pkg.Serialize())
 	conn.Close()
-	NewConns().Remove(conn)
+	if 0 == NewConns().Remove(conn) && conn.ID != 0 { // the first 0 means do not have new
+		log.Println("do not have new")
+		GetServer().GetProducer().Send(GetConfiguration().NsqConfig.UpTopic, notify_gateway_offline_pkg.Serialize())
+	}
 	log.Println(NewConns())
 }
 

@@ -49,17 +49,20 @@ func (cs *Conns) GetConn(uid uint64) *Conn {
 	return cs.connsuid[uid]
 }
 
-func (cs *Conns) Remove(c *Conn) {
+func (cs *Conns) Remove(c *Conn) int {
 	cs.mutex_index.Lock()
 	delete(cs.connsindex, c.index)
 	cs.mutex_index.Unlock()
 
 	cs.mutex_uid.Lock()
+	defer cs.mutex_uid.Unlock()
 	connuid, ok := cs.connsuid[c.ID]
 	if ok && c.index == connuid.index {
 		delete(cs.connsuid, c.ID)
+		return 0 // do not have new
 	}
-	cs.mutex_uid.Unlock()
+
+	return 1 // have new
 }
 
 func (cs *Conns) Check(uid uint64) bool {

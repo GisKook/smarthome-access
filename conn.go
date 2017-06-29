@@ -31,6 +31,7 @@ type Conn struct {
 	ID                   uint64
 	Status               uint8
 	Gateway              *base.Gateway
+	TimeStamp            int64
 	ReadMore             bool
 }
 

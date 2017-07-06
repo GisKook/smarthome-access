@@ -155,6 +155,11 @@ func (this *ShaProtocol) ReadPacket(c *gotcp.Conn) (gotcp.Packet, error) {
 			smconn.ReadMore = false
 
 			return NewShaPacket(protocol.Feedback_Warn, pkg), nil
+		case protocol.Notify_Upgrade_Status:
+			pkg := protocol.Parse_Notify_Upgrade_Status(pkgbyte)
+			smconn.ReadMore = false
+
+			return NewShaPacket(protocol.Notify_Upgrade_Status, pkg), nil
 
 		case protocol.Illegal:
 			smconn.ReadMore = true

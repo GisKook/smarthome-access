@@ -29,6 +29,7 @@ message Command {
 		CMT_REP_FEEDBACK_LEVEL         = 0x0011;
 		CMT_REP_FEEDBACK_WARN          = 0x000d;
 		CMT_REP_NOTIFY_GATEWAY_OFFLINE = 0x0102;
+		CMT_REP_NOTIFY_UPGRADE_STATUS  = 0x003f;
 		
 		
 		// web->gateway

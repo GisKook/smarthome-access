@@ -37,6 +37,7 @@ var (
 	Notify_Temperature     uint16 = 0x0024
 	Notify_Humidity        uint16 = 0x0025
 	Notify_Security_Aids   uint16 = 0x0030
+	Notify_Upgrade_Status  uint16 = 0x003f
 )
 
 func ParseHeader(buffer []byte) *bytes.Reader {

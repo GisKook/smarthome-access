@@ -34,7 +34,6 @@ func (this *Callback) OnClose(c *gotcp.Conn) {
 	conn := c.GetExtraData().(*Conn)
 	conn.Close()
 	NewConns().Remove(conn)
-	log.Println(NewConns())
 }
 
 func on_login(c *gotcp.Conn, p *ShaPacket) {
